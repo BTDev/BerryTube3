@@ -1,40 +1,30 @@
 <!doctype html>
-<html lang="en" ng-app="phonecatApp">
+<html lang="en" ng-app="btApp">
 	<head>
 		<meta charset="utf-8">
 		<title>My HTML File</title>
 		<link rel="stylesheet" href="css/app.css">
 		<link rel="stylesheet" href="css/bootstrap.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/js/controllers.js"></script>
-		<script>
-			var socket = io.connect('http://localhost');
-				socket.on('news', function (data) {
-					console.log(data);
-				socket.emit('my other event', { my: 'data' });
-			});
-		</script>
 	</head>
-	<body ng-controller="PhoneListCtrl">
-	 
-		<div class="container-fluid">
-			<div class="row-fluid">
-				<div class="span2">
-					<!--Sidebar content-->
-					Search: <input ng-model="query">
-				</div>
-				<div class="span10">
-					<!--Body content-->
-					<ul class="phones">
-						<li ng-repeat="phone in phones | filter:query">
-							{{phone.name}}
-							<p>{{phone.snippet}}</p>
-						</li>
-					</ul>
-
-				</div>
-			</div>
+	<body>
+	
+		<div ng-controller="userList">
+			<h1>Connected Users: {{userCount}}</h1>
+			<ul class="people">
+				<li ng-repeat="user in users">
+					<button ng-click="$parent.go();">{{user.name}}</button>
+				</li>
+			</ul>
+			<button ng-click="userCount = userCount + 1">{{user.name}}</button>
+		</div>
+		<div ng-controller="timer">
+			<h1>{{timer}}</h1>
 		</div>
 		
 	</body>
