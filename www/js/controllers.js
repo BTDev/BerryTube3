@@ -1,3 +1,6 @@
+//USEFUL
+// http://jsfiddle.net/icoxfog417/nj7Lw/
+
 var btApp = angular.module('btApp', []);
 
 btApp.factory('socket',function($rootScope){
@@ -25,6 +28,15 @@ btApp.factory('socket',function($rootScope){
 });
 var injector = angular.injector(['btApp', 'ng']);
 var socket = injector.get('socket');
+
+/*
+btApp.factory("moarPones",function($rootScope){
+	console.log($rootScope);
+    return {};
+})
+var injector = angular.injector(['btApp', 'ng']);
+var socket = injector.get('moarPones');
+*/
 
 function userList($scope, socket) {
 	
