@@ -1,7 +1,7 @@
 //USEFUL
 // http://jsfiddle.net/icoxfog417/nj7Lw/
 
-var btApp = angular.module('btApp', []);
+var btApp = angular.module('btApp', ['ngAnimate']);
 
 btApp.factory('socket',function($rootScope){
 	var socket = io.connect();
@@ -123,7 +123,7 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 		$scope.refreshPlaylist();
 	});
 });
-btApp.directive('btPlaylistVideo', function() {
+btApp.directive('btPlaylistVideo', function($interval) {
 	var elems = []
 	elems.push('<video-title>{{video.videoTitle}}</video-title>');
 	elems.push('<video-length data-raw-length="{{video.videoLength}}">{{ formatLength(video.videoLength) }}</video-length>');
