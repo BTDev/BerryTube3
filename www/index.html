@@ -26,8 +26,12 @@
 		<div ng-controller="timer">
 			<h1>{{timer}}</h1>
 		</div>
-		<div chat-box-control>
 		
+		<div ng-controller="playlistController">
+			<div ng-repeat="video in playlist" data-guid="{{video._id}}">
+				<div class="videoTitle">{{video.videoTitle}}</div>
+				<div class="videoLength">{{ formatLength(video.videoLength) }}</div>
+			</div>
 		</div>
 		
 	</body>

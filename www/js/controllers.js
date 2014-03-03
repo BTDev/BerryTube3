@@ -54,6 +54,55 @@ function userList($scope, socket) {
 	
 }
 
+function playlistController($scope, socket){
+
+	var pz = function(x){
+		if(x<10) return "0"+x;
+		return x;
+	}
+
+	$scope.formatLength = function(len){
+	
+		var seconds = len;
+		
+		var minutes = Math.floor(seconds / 60);
+		seconds = seconds % 60;
+		
+		var hours = Math.floor(minutes / 60);
+		minutes = minutes % 60;
+		
+		var days = Math.floor(hours / 24);
+		hours = hours % 24;
+		
+		var out = [];
+		if(days > 0){
+			out.push(pz(days));
+			out.push(pz(hours));
+			out.push(pz(minutes));
+			out.push(pz(seconds));
+		} else if(hours > 0) {
+			out.push(pz(hours));
+			out.push(pz(minutes));
+			out.push(pz(seconds));
+		} else if(minutes > 0) {
+			out.push(pz(minutes));
+			out.push(pz(seconds));
+		} else if(seconds > 0) {
+			out.push(pz(seconds));
+		} else {
+			out.push("--");
+		}
+		//console.log(out.join(" : "));
+		return out.join(" : ");
+		
+	}
+
+	socket.on('recvPlaylist', function (data) {
+		$scope.playlist = data.playlist;
+		//console.log(data.playlist);
+	});
+}
+
 function timer($scope, socket){
 	$scope.timer = 0;
 	
