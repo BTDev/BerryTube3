@@ -3,12 +3,17 @@
 	<head>
 		<meta charset="utf-8">
 		<title>My HTML File</title>
-		<link rel="stylesheet" href="css/app.css">
+		<!-- Main CSS -->
+		<link rel="stylesheet" href="css/master.css">
 		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/tinyscrollbar.css">
+		<!-- CDN Stuff -->
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<!-- Local Stuff -->
+		<script src="/js/jquery.tinyscrollbar.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/js/controllers.js"></script>
 	</head>
@@ -21,18 +26,21 @@
 					<button ng-click="$parent.go();">{{user.name}}</button>
 				</li>
 			</ul>
-			<button ng-click="userCount = userCount + 1">{{user.name}}</button>
+			<button ng-click="userCount = userCount + 1">Artifically increase usercount in memory</button>
 		</div>
+
 		<div ng-controller="timer">
 			<h1>{{timer}}</h1>
 		</div>
 		
-		<div ng-controller="playlistController">
-			<div ng-repeat="video in playlist" data-guid="{{video._id}}">
-				<div class="videoTitle">{{video.videoTitle}}</div>
-				<div class="videoLength">{{ formatLength(video.videoLength) }}</div>
+		<div id="playlist" ng-controller="playlistController">
+			<div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
+			<div class="viewport">
+				 <div class="overview">
+					<bt-playlist-video ng-repeat="video in playlist" ng-click="showVideoMenu(video)"></bt-playlist-video>
+				</div>
 			</div>
 		</div>
-		
+				
 	</body>
 </html>

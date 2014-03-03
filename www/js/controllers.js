@@ -26,8 +26,9 @@ btApp.factory('socket',function($rootScope){
 		}
 	};
 });
-var injector = angular.injector(['btApp', 'ng']);
-var socket = injector.get('socket');
+
+//var injector = angular.injector(['btApp', 'ng']);
+//var socket = injector.get('socket');
 
 /*
 btApp.factory("moarPones",function($rootScope){
@@ -38,11 +39,11 @@ var injector = angular.injector(['btApp', 'ng']);
 var socket = injector.get('moarPones');
 */
 
-function userList($scope, socket) {
+btApp.controller('userList',function($scope, socket) {
 	
 	socket.on('init', function (data) {
 		$scope.users = data.users;
-		$scope.timer = 0;
+		$scope.timer = -1;
 	});
 	socket.on('userCount', function (data) {
 		$scope.userCount = data;
@@ -52,13 +53,25 @@ function userList($scope, socket) {
 		console.log(this);
 	}
 	
-}
+});
 
-function playlistController($scope, socket){
+btApp.controller('playlistController', function($scope, $element, socket, $timeout){
 
 	var pz = function(x){
 		if(x<10) return "0"+x;
 		return x;
+	}
+	
+	$scope.debug = function(o){
+		console.log("got dbg",o);
+	}
+	
+	$scope.showVideoMenu = function(video){
+		var pu = $("<div/>").addClass("popup").appendTo("body");
+		var ul = $("<ul/>").appendTo(pu);
+		var li = $("<li/>").appendTo(ul);
+		var a = $("<a/>").text(video.videoTitle).appendTo(li);
+		ul.menu();
 	}
 
 	$scope.formatLength = function(len){
@@ -84,24 +97,41 @@ function playlistController($scope, socket){
 			out.push(pz(hours));
 			out.push(pz(minutes));
 			out.push(pz(seconds));
-		} else if(minutes > 0) {
+		} else if(seconds > 0 || minutes > 0) { // Skip to seconds because seeing a "30" by a video looks weirder than a 00:30
 			out.push(pz(minutes));
-			out.push(pz(seconds));
-		} else if(seconds > 0) {
 			out.push(pz(seconds));
 		} else {
 			out.push("--");
 		}
 		//console.log(out.join(" : "));
-		return out.join(" : ");
+		return out.join(":");
 		
+	}	
+
+	$scope.refreshPlaylist = function(){
+		$timeout(function(){ // I have a feeling i'm going to get used to this.
+			if(typeof $($element).data("plugin_tinyscrollbar") == "undefined"){
+				$($element).tinyscrollbar({ thumbSize: 15 });
+			} else {
+				$($element).data("plugin_tinyscrollbar").update();
+			}
+		}, 0);
 	}
 
 	socket.on('recvPlaylist', function (data) {
 		$scope.playlist = data.playlist;
-		//console.log(data.playlist);
+		$scope.refreshPlaylist();
 	});
-}
+});
+btApp.directive('btPlaylistVideo', function() {
+	var elems = []
+	elems.push('<video-title>{{video.videoTitle}}</video-title>');
+	elems.push('<video-length data-raw-length="{{video.videoLength}}">{{ formatLength(video.videoLength) }}</video-length>');
+	return {
+		restrict: 'E',
+		template: elems.join("")
+	};
+});
 
 function timer($scope, socket){
 	$scope.timer = 0;
