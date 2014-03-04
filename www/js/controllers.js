@@ -73,6 +73,10 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 		var a = $("<a/>").text(video.videoTitle).appendTo(li);
 		ul.menu();
 	}
+	
+	$scope.delVideo = function(video){
+		$scope.playlist.splice($scope.playlist.indexOf(video),1);
+    }
 
 	$scope.formatLength = function(len){
 	
@@ -123,13 +127,35 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 		$scope.refreshPlaylist();
 	});
 });
-btApp.directive('btPlaylistVideo', function($interval) {
-	var elems = []
-	elems.push('<video-title>{{video.videoTitle}}</video-title>');
-	elems.push('<video-length data-raw-length="{{video.videoLength}}">{{ formatLength(video.videoLength) }}</video-length>');
+btApp.directive('btPlaylistVideo', function($compile, $interval) {
 	return {
 		restrict: 'E',
-		template: elems.join("")
+		link:function(scope, element, attrs){
+		
+			// Setup Cleaning
+			element.on('$destroy', function() {
+				console.log(element,"Deleted");
+			});
+						
+			$compile($("<video-title/>").appendTo($(element[0])))(scope);
+			$compile($("<video-length/>").appendTo($(element[0])))(scope);
+			$compile($("<input/>").attr("ng-model","video.videoTitle").appendTo($(element[0])))(scope);
+			var delbtn = $("<button/>").text("kill").attr("ng-click","delVideo(video)").appendTo($(element[0]));
+			$compile(delbtn)(scope);
+			
+		}
+	};
+});
+btApp.directive('videoTitle', function($compile, $interval) {
+	return {
+		restrict: 'E',
+		template:"{{video.videoTitle}}"
+	};
+});
+btApp.directive('videoLength', function($compile, $interval) {
+	return {
+		restrict: 'E',
+		template:"{{ formatLength(video.videoLength) }}"
 	};
 });
 

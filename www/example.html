@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" ng-app="btApp">
+	<head>
+		<meta charset="utf-8">
+		<title>My HTML File</title>
+		<!-- Main CSS -->
+		<link rel="stylesheet" href="css/master.css">
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/tinyscrollbar.css">
+		<!-- CDN Stuff -->
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-animate.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<!-- Local Stuff -->
+		<script src="js/model-example.js"></script>
+		<script src="js/controllers-example.js"></script>
+		<style>
+			bt-list {
+				background: none repeat scroll 0 0 #000000;
+				border-radius: 50%;
+				display: block;
+				height: 30px;
+				width: 30px;
+			}
+		</style>
+	</head>
+	<body ng-controller="exampleController">
+
+		<bt-list ng-repeat="video in playlist" ng-click="addStone()"></bt-list>
+
+	</body>
+</html>
