@@ -43,7 +43,7 @@ bt.db.playlist.find({}, function (err, playlist) {
 	
 	// Check if playlist import exists
 	var importPath = 'videos.json';
-	path.exists(importPath, function(exists) { 
+	fs.exists(importPath, function(exists) { 
 		console.log("Checking for 'videos.json' to import");
 		if (exists) { 
 			var importedNum = 0;
@@ -85,24 +85,22 @@ bt.db.playlist.find({}, function (err, playlist) {
 	}); 
 });
 bt.emitPlaylist = function(socket){
-
-	var startTime = new Date().getTime();
-	zlib.deflate(JSON.stringify(bt.playlist), function(err, buffer) {
-		if (!err) {
-		
-			var stopTime = new Date().getTime();
-			console.log('Emitting playlist -- Took ',(stopTime - startTime),"millis");
-			console.log('Raw Size: ',(JSON.stringify(bt.playlist).length));
-			console.log('Compressed Size: ',buffer.length);
-			
-			socket.emit("recvPlaylist",{
-				playlist:bt.playlist
-			});
-			
-		}
+	socket.emit("recvPlaylist",{
+		playlist:bt.playlist
 	});
-	
-	
+}
+
+bt.deleteVideoById = function(id){
+	for(var i in bt.playlist){
+		if(bt.playlist[i]._id == id){
+			console.log("deleting ",bt.playlist[i]);
+			bt.playlist.splice(bt.playlist.indexOf(bt.playlist[i]),1);
+			io.sockets.emit("deleteVideoById",{
+				id:id
+			});
+			break;
+		}
+	}
 }
 
 bt.connectedUsers = 0;
@@ -120,9 +118,9 @@ io.sockets.on('connection', function (socket) {
 	socket.on('my other event', function (data) {
 		console.log(data);
 	});
-	var tick = 0;
-	setInterval(function(){
-		socket.emit('tick',tick++);
-	},1000);
+	
+	socket.on('deleteVideo', function (data) {
+		bt.deleteVideoById(data.id);
+	});
   
 });

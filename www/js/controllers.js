@@ -57,6 +57,9 @@ btApp.controller('userList',function($scope, socket) {
 
 btApp.controller('playlistController', function($scope, $element, socket, $timeout){
 
+	// Properties 
+	$scope.playlist = null;
+
 	var pz = function(x){
 		if(x<10) return "0"+x;
 		return x;
@@ -75,7 +78,9 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 	}
 	
 	$scope.delVideo = function(video){
-		$scope.playlist.splice($scope.playlist.indexOf(video),1);
+		socket.emit("deleteVideo",{
+			id:video._id
+		});
     }
 
 	$scope.formatLength = function(len){
@@ -117,7 +122,9 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 			if(typeof $($element).data("plugin_tinyscrollbar") == "undefined"){
 				$($element).tinyscrollbar({ thumbSize: 15 });
 			} else {
-				$($element).data("plugin_tinyscrollbar").update();
+				var tsb = $($element).data("plugin_tinyscrollbar");
+				tsb.update("relative",0);
+				console.log(tsb.contentPosition / tsb.contentSize);
 			}
 		}, 0);
 	}
@@ -125,6 +132,17 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 	socket.on('recvPlaylist', function (data) {
 		$scope.playlist = data.playlist;
 		$scope.refreshPlaylist();
+	});
+	
+	socket.on('deleteVideoById', function (data) {
+		for(var i in $scope.playlist){
+			if($scope.playlist[i]._id == data.id){
+				console.log("deleting ",$scope.playlist[i]);
+				$scope.playlist.splice($scope.playlist.indexOf($scope.playlist[i]),1);
+				$scope.refreshPlaylist();
+				break;
+			}
+		}
 	});
 });
 btApp.directive('btPlaylistVideo', function($compile, $interval) {
