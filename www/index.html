@@ -38,7 +38,7 @@
 			<div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>
 			<div class="viewport">
 				 <div class="overview">
-					<bt-playlist-video ng-repeat="video in playlist"></bt-playlist-video>
+					<bt-playlist-video ng-repeat="video in playlist | orderBy: 'video.order'"></bt-playlist-video>
 				</div>
 			</div>
 		</div>

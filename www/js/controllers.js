@@ -59,6 +59,7 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 
 	// Properties 
 	$scope.playlist = null;
+	$scope.heap = null;
 
 	var pz = function(x){
 		if(x<10) return "0"+x;
@@ -130,11 +131,24 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 	}
 
 	socket.on('recvPlaylist', function (data) {
-		$scope.playlist = data.playlist;
-		$scope.refreshPlaylist();
+		$timeout(function(){
+			$scope.playlist = data.playlist;
+			$scope.refreshPlaylist();
+			$( "#playlist .overview" ).sortable({
+				stop: function(event, ui) {
+					var fromId = angular.element(ui.item).scope().video._id;
+					var toId = $scope.playlist[ui.item.index()]._id;
+					socket.emit("moveVideo",{
+						fromId:fromId,
+						toId:toId,
+					});
+					return false;
+				}
+			});
+		},100)
 	});
 	
-	socket.on('deleteVideoById', function (data) {
+	socket.on('deleteVideo', function (data) {
 		for(var i in $scope.playlist){
 			if($scope.playlist[i]._id == data.id){
 				console.log("deleting ",$scope.playlist[i]);
@@ -143,6 +157,12 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 				break;
 			}
 		}
+	});
+	
+	socket.on('moveVideo', function (data) {	
+		$scope.playlist[data.fromOrder].order = data.toOrder;
+		$scope.playlist[data.toOrder].order = data.fromOrder;
+		console.log($scope.playlist[data.fromOrder].order);
 	});
 });
 btApp.directive('btPlaylistVideo', function($compile, $interval) {
@@ -167,7 +187,7 @@ btApp.directive('btPlaylistVideo', function($compile, $interval) {
 btApp.directive('videoTitle', function($compile, $interval) {
 	return {
 		restrict: 'E',
-		template:"{{video.videoTitle}}"
+		template:"{{video.videoTitle}} {{video.order}}"
 	};
 });
 btApp.directive('videoLength', function($compile, $interval) {
