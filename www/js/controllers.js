@@ -55,7 +55,7 @@ btApp.controller('userList',function($scope, socket) {
 	
 });
 
-btApp.controller('playlistController', function($scope, $element, socket, $timeout){
+btApp.controller('playlistController', function($scope, $element, socket, $timeout, $filter){
 
 	// Properties 
 	$scope.playlist = null;
@@ -132,6 +132,7 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 
 	socket.on('recvPlaylist', function (data) {
 		$timeout(function(){
+			//$scope.playlist = $filter('orderBy')(data.playlist, 'order');
 			$scope.playlist = data.playlist;
 			$scope.refreshPlaylist();
 			$( "#playlist .overview" ).sortable({
@@ -159,10 +160,20 @@ btApp.controller('playlistController', function($scope, $element, socket, $timeo
 		}
 	});
 	
-	socket.on('moveVideo', function (data) {	
-		$scope.playlist[data.fromOrder].order = data.toOrder;
-		$scope.playlist[data.toOrder].order = data.fromOrder;
-		console.log($scope.playlist[data.fromOrder].order);
+	socket.on('moveVideo', function (data) {
+		$timeout(function(){
+			//console.log(data);
+			var from = $scope.playlist[data.fromOrder];
+			var frompos = $scope.playlist.indexOf(from);
+			var to = $scope.playlist[data.toOrder];
+			var topos = $scope.playlist.indexOf(to);
+			//console.log("from",from,"to",to);
+			$scope.playlist.splice(topos, 0, $scope.playlist.splice(frompos, 1)[0]);
+			$scope.$apply();
+			//$scope.$apply();
+			//$scope.playlist = $filter('orderBy')($scope.playlist, 'order');
+			//console.log($scope.playlist);
+		},0);
 	});
 });
 btApp.directive('btPlaylistVideo', function($compile, $interval) {
