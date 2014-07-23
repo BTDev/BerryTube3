@@ -1,0 +1,19 @@
+doctype html
+html
+	head
+		title jade
+		if stylesheets
+			each css in stylesheets
+				link(rel="stylesheet", href=css.href, type="text/css")
+		if scripts
+			each js in scripts
+				script(src=js.src)
+	body
+		h1 Hello user.
+		p.
+			lol paragraph text
+			wooo			
+		select.what
+			option turn
+			option down
+			option for

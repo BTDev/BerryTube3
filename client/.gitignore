@@ -214,11 +214,5 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-#Ignore Node install on winders.
+# Node
 node_modules/
-npm.cmd
-npm
-nodevars.bat
-node_perfctr_provider.man
-node_etw_provider.man
-node.exe
