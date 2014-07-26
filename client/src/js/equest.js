@@ -1,1 +1,3 @@
-alert ( "turn down for hwhat" );
+$(function(){
+	$("<div/>").text("eat shit lol").dialog();
+})

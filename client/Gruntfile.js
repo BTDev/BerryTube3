@@ -4,66 +4,97 @@ var path = require('path')
 module.exports = function(grunt) {
 
 	// Project configuration.
+	var fileHeaders = {
+		"Project":'<%= pkg.name %> <%= pkg.version %> ',
+		"Last dist":'<%= grunt.template.today("isoDateTime") %>',
+	};
+	var headerString = '';
+	var hs = [];
+	for(var header in fileHeaders){
+		hs.push(header+": "+fileHeaders[header]);
+	}
+	headerString = '/*\r\n\t'+hs.join('\r\n\t')+'\r\n*/\n';
+
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		uglify: {
 			options: {
 				mangle: false,
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> get fucking r3kt */\n'
+				banner: headerString
 			},
-			build: {
-				src: 'src/js/<%= pkg.name %>.js',
-				dest: 'build/js/<%= pkg.name %>.min.js'
+			dist: {
+				files: [{
+					src: 'js/**/*.js', 
+					expand: true,
+					cwd: 'src',
+					dest: 'dist',
+					ext:".min.js",
+				}],
+				mangle: false,
+				banner: headerString
 			}
 		},
 		stylus: {
 			compile: {
-				options: {
-				
+				options: { 
+					banner: headerString
 				},
 				files: [{
 					expand: true,
 					cwd: 'src',
 					src: ['**/*.styl'],
-					dest: 'build',
+					dest: 'dist',
 					ext: '.css'
 				}]
 			}
 		},
 		watch: {
 			scripts: {
-				files: '**/*.js',
+				files: ['src/**/*.js','!**/node_modules/**'],
 				tasks: ['uglify']
 			},
 			stylus: {
-				files: '**/*.styl',
+				files: ['src/**/*.styl','src/**/*.css','!**/node_modules/**'],
 				tasks: ['stylus']
 			},
 			jade: {
-				files: '**/*.jade',
+				files: ['src/**/*.jade','!**/node_modules/**'],
 				tasks: ['jade']
 			},
 			copy: {
-				files: [ 'src/**', '!src/**/*.styl', '!src/**/*.css', '!src/**/*.jade' ],
-				tasks: ['copy']
+				files: [ 'src/**', '!src/**/*.styl', '!src/**/*.css', '!src/**/*.jade' ,'!**/node_modules/**'],
+				tasks: ['copy'],
+				options: {
+			      event: ['changed'],
+			    }
+			},
+			dist: {
+				files: [ 'src/**', '!src/**/*.styl', '!src/**/*.css', '!src/**/*.jade' ,'!**/node_modules/**'],
+				tasks: ['build'],
+				options: {
+			      event: ['added', 'deleted'],
+			    }
 			},
 		},
 		copy: {
-			build: {
+			dist: {
 				cwd: 'src',
 				src: [ 
 					'**',
 					'!**/*.styl',
-					'!**/*.css',
-					'!**/*.jade' 
+					//'!**/*.css',
+					'!**/*.jade',
+					'!**/*.js',
+					//'**/*.min.js',
+					'!**/elements/**'
 				],
-				dest: 'build',
+				dest: 'dist',
 				expand: true
 			},
 		},
 		clean: {
-			build: {
-				src: [ 'build' ]
+			dist: {
+				src: [ 'dist' ]
 			},
 		},
 		jade: {
@@ -71,21 +102,27 @@ module.exports = function(grunt) {
 				options: {
 					data: function(dest,src){
 						var data = [];
-						
+
 						var scripts = []
-						var jsFiles = fs.readdirSync("src/js/");
+						var cwd = "src/js/";
+						var jsFiles = fs.readdirSync(cwd);
 						for(var i in jsFiles){
-							scripts.push({
-								src:'js/' + path.basename(jsFiles[i],path.extname(jsFiles[i])) + '.min.js'
-							})
+							if(fs.lstatSync(cwd+jsFiles[i]).isFile()){
+								scripts.push({
+									src:'js/' + path.basename(jsFiles[i],path.extname(jsFiles[i])) + '.min.js'
+								})
+							}
 						}
 						
 						var stylesheets = []
-						var jsFiles = fs.readdirSync("src/css/");
+						var cwd = "src/css/";
+						var jsFiles = fs.readdirSync(cwd);
 						for(var i in jsFiles){
-							stylesheets.push({
-								href:'css/' + path.basename(jsFiles[i],path.extname(jsFiles[i])) + '.css'
-							})
+							if(fs.lstatSync(cwd+jsFiles[i]).isFile()){
+								stylesheets.push({
+									href:'css/' + path.basename(jsFiles[i],path.extname(jsFiles[i])) + '.css'
+								})
+							}
 						}
 						
 						data.scripts = scripts;
@@ -96,12 +133,21 @@ module.exports = function(grunt) {
 				files: [{
 					expand: true,
 					cwd: 'src',
-					src: [ '**/*.jade' ],
-					dest: 'build',
+					src: [ '**/*.jade', '!**/elements/**' ],
+					dest: 'dist',
 					ext: '.html'
 				}]
 			}
 		},
+		wiredep: {
+			target: {
+				// Point to the files that should be updated when
+				// you run `grunt wiredep`
+				src: [
+					'dist/**/*.html',   // .html support...
+				],
+			}
+		}
 	});
 
 	// Load the plugins.
@@ -114,10 +160,18 @@ module.exports = function(grunt) {
 	
 	// Default task(s).
 	grunt.registerTask('default', "testing",function(){
+		grunt.task.run('host');
 		grunt.task.run('build');
 		grunt.task.run('watch');
 	});
 	
-	grunt.registerTask('build','Compiles all of the assets and copies the files to the build directory.', [ 'clean', 'copy', 'uglify', 'stylus', 'jade' ]);
+	grunt.registerTask('host','starts an express server.', function(){
+		var express = require('express');
+		var app = express();
+		app.use(express.static(__dirname + '/dist'));
+		app.listen(process.env.PORT || 3000);
+	});
+
+	grunt.registerTask('build','Compiles all of the assets and copies the files to the dist directory.', [ 'clean', 'copy', 'uglify', 'stylus', 'jade' ]);
 
 };
