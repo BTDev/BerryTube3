@@ -51,21 +51,33 @@ module.exports = function(grunt) {
 		watch: {
 			scripts: {
 				files: ['src/**/*.js','!**/node_modules/**'],
-				tasks: ['uglify']
+				tasks: ['uglify'],
+			    options: {
+			      livereload: true,
+			    }
 			},
 			stylus: {
 				files: ['src/**/*.styl','src/**/*.css','!**/node_modules/**'],
-				tasks: ['stylus']
+				tasks: ['stylus'],
+			    options: {
+			      livereload: true,
+			    }
 			},
 			jade: {
 				files: ['src/**/*.jade','!**/node_modules/**'],
-				tasks: ['jade']
+				tasks: ['jade'],
+			    options: {
+			      livereload: true,
+			    }
 			},
 			copy: {
 				files: [ 'src/**', '!src/**/*.styl', '!src/**/*.css', '!src/**/*.jade' ,'!**/node_modules/**'],
 				tasks: ['copy'],
 				options: {
 			      event: ['changed'],
+			    },
+			    options: {
+			      livereload: true,
 			    }
 			},
 			dist: {
@@ -73,6 +85,9 @@ module.exports = function(grunt) {
 				tasks: ['build'],
 				options: {
 			      event: ['added', 'deleted'],
+			    },
+			    options: {
+			      livereload: true,
 			    }
 			},
 		},
@@ -137,15 +152,6 @@ module.exports = function(grunt) {
 					dest: 'dist',
 					ext: '.html'
 				}]
-			}
-		},
-		wiredep: {
-			target: {
-				// Point to the files that should be updated when
-				// you run `grunt wiredep`
-				src: [
-					'dist/**/*.html',   // .html support...
-				],
 			}
 		}
 	});
