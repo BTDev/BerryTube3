@@ -16,7 +16,10 @@ for(var i in bt.db){
 
 var Video = require('./bt_data/video.js')(bt.config,bt.db.video);
 bt.playlist = require('./bt_data/playlist.js')(bt.config,bt.db.playlist,Video);
-bt.playlist.load();
+bt.playlist.load(function(){
+	bt.playlist.save();
+});
+
 
 /*
 for(var i=0;i<100;i++){

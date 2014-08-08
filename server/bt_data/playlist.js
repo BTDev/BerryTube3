@@ -20,7 +20,7 @@ module.exports = function(config,playlistdb,Video){
 
 		if(!(video instanceof Video)) { playlist.trigger('error',"must add a Video object"); return; }
 		if(after && !(after instanceof Video)) { playlist.trigger('error',"must use Video object or null for placement"); return; }
-		console.log("Adding video",video.data.tit,video.data._id);
+		//console.log("Adding video",video.data.tit,video.data._id);
 
 		// Do we even have a playlist
 		if(!playlist._first){
@@ -47,13 +47,15 @@ module.exports = function(config,playlistdb,Video){
 			playlist._lookup[video._id] = playlist._first;
 
 			// Done!
+			if(callback)callback();
 			return;
 		} 
 
 		// If "After" is null or undef, then add to end.
 		var insertAfter = playlist._last;
 		if(after){
-			insertAfter = after;
+			insertAfter = playlist._lookup[after._id];
+			//console.log("inserting after",after._id);
 		}
 
 		// General Entry
@@ -74,14 +76,23 @@ module.exports = function(config,playlistdb,Video){
 			playlist._last = entry; // If we just inserted ourselves "after" the last element, the new element is the last one.
 		}
 
+		// Hook up the random-access helper
+		playlist._lookup[video._id] = entry;
+
+		// Adjust length
 		playlist._length++;
+
+		if(callback)callback();
 
 	}
 
 	playlist.save = function(callback){
+
+		console.log("called Save");
 		var flat = [];
 		var elem = playlist._first;
 		for(var i=0;i<playlist._length;i++){
+			elem.video.save();
 			flat[i] = (elem.video.data._id);
 			//console.log(elem);
 			elem = elem.next;
@@ -91,9 +102,11 @@ module.exports = function(config,playlistdb,Video){
 			if(err) console.log(err);
 			if(callback) callback(err, numReplaced, upsert);
 		});
+
 	}
 
-	playlist.load = function(){
+	playlist.load = function(callback){
+
 		playlist.db.findOne({ name: playlist.name }, function (err, doc) {
 			if(err) {
 				console.log(err);
@@ -103,28 +116,27 @@ module.exports = function(config,playlistdb,Video){
 			if(!doc || doc.length == 0) return;
 
 			var toadd = doc.videos;
+			var last = null;
+			var done = function(){
+				console.log("Playlist now",playlist._length,"Videos Long");
+				if(callback)callback();
+			}
 			var deque = function(){
 				var videoid = toadd.shift();
-				var vid = new Video(videoid,function(){
-					playlist.add(null,vid);
-					if(toadd.length > 0){
-						deque();
-					}
+				var vid = new Video(videoid,function(){		// Init the video
+					playlist.add(last,vid,function(){	// Add to playlist
+						if(toadd.length > 0){		// Check queue
+							last = vid; // remember last one for placing.
+							deque();
+						} else {
+							done();
+						}
+					});
+					
 				});
 			}
 			deque();
 
-			/*
-			playlist._first = null;
-			for(var i=0;i<doc.videos.length;i++){
-				(function(_id){
-					var vid = new Video(_id);
-					//console.log(vid);
-					playlist.add(null,vid);
-				})(doc.videos[i]);
-			}
-			*/
-			//console.log(playlist);
 		})
 	}
 
