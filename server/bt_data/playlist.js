@@ -3,9 +3,13 @@
 	Create playlist object with a project config, a playlist DB already pre-configured, and a Video closure, for comparisons.
 
 */
+
+events = require('events');
+
 module.exports = function(config,playlistdb,Video){
 
-	var playlist = {};
+
+	var playlist = new events.EventEmitter;
 	playlist.db = playlistdb;
 	playlist.name = "Playlist";
 	playlist._first = null;
@@ -17,9 +21,10 @@ module.exports = function(config,playlistdb,Video){
 	// Linked List Object
 
 	playlist.add = function(after,video,callback){
+		var self = this;
 
-		if(!(video instanceof Video)) { playlist.trigger('error',"must add a Video object"); return; }
-		if(after && !(after instanceof Video)) { playlist.trigger('error',"must use Video object or null for placement"); return; }
+		if(!(video instanceof Video)) { playlist.emit('error',"must add a Video object"); return; }
+		if(after && !(after instanceof Video)) { playlist.emit('error',"must use Video object or null for placement"); return; }
 		//console.log("Adding video",video.data.tit,video.data._id);
 
 		// Do we even have a playlist
@@ -47,7 +52,10 @@ module.exports = function(config,playlistdb,Video){
 			playlist._lookup[video._id] = playlist._first;
 
 			// Done!
-			if(callback)callback();
+			video.save(function(){ // Implicitly saves any new video added before callbacks, to ensure videos get an internal ID.
+				self.emit("add",after,video);
+				if(callback)callback();
+			});
 			return;
 		} 
 
@@ -82,47 +90,80 @@ module.exports = function(config,playlistdb,Video){
 		// Adjust length
 		playlist._length++;
 
-		if(callback)callback();
+		video.save(function(){ // Implicitly saves any new video added before callbacks, to ensure videos get an internal ID.
+			self.emit("add",after,video);
+			if(callback)callback();
+		});
+
+	}
+
+	playlist.remove = function(video,callback){
+
+		// Grab friends
+		var prev = video.prev;
+		var next = video.next;
+
+		// Adjust Friends
+		prev.next = next;
+		next.prev = prev;
+
+		// Update first/last as nessicary.
+		if(playlist._last == video) { playlist._last = prev; }
+		if(playlist._first == video) { playlist._first = next; }
+
+		// Kill yourself.
+		this.emit("remove",video);
+		if(callback)callback(video);
 
 	}
 
 	playlist.save = function(callback){
-
-		console.log("called Save");
+		var self = this;
 		var flat = [];
 		var elem = playlist._first;
 		for(var i=0;i<playlist._length;i++){
-			elem.video.save();
+			console.log(elem);
+			//elem.video.save();  This should be insured by the new add function save wrap.
 			flat[i] = (elem.video.data._id);
-			//console.log(elem);
 			elem = elem.next;
 		}
-		//console.log(flat);
+		//console.log(elem);
 		playlist.db.update({ name: playlist.name }, { name: playlist.name, videos: flat }, { upsert: true }, function (err, numReplaced, upsert) {
 			if(err) console.log(err);
+			self.emit("save");
 			if(callback) callback(err, numReplaced, upsert);
 		});
 
 	}
 
 	playlist.load = function(callback){
-
+		var self = this;
 		playlist.db.findOne({ name: playlist.name }, function (err, doc) {
+
 			if(err) {
 				console.log(err);
 				return;
 			}
 
-			if(!doc || doc.length == 0) return;
+			if(!doc || doc.length == 0){
+				self.emit("load");
+				return;	
+			} 
 
 			var toadd = doc.videos;
 			var last = null;
+
 			var done = function(){
-				console.log("Playlist now",playlist._length,"Videos Long");
+				self.emit("load");
 				if(callback)callback();
 			}
+
 			var deque = function(){
 				var videoid = toadd.shift();
+				if(!videoid){
+					done();
+					return;
+				}
 				var vid = new Video(videoid,function(){		// Init the video
 					playlist.add(last,vid,function(){	// Add to playlist
 						if(toadd.length > 0){		// Check queue
@@ -137,14 +178,15 @@ module.exports = function(config,playlistdb,Video){
 			}
 			deque();
 
-		})
+		});
 	}
 
-	playlist.trigger = function(event,message){
-		console.log(event,message);
+	playlist.get = function(videoid){
+		return playlist._lookup[videoid];
 	}
 
 	//playlist.load(db);
+	//console.log(playlist);
 	return playlist;
 
 };
