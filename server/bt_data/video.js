@@ -78,7 +78,7 @@ module.exports = function(config,db){
 
 			// Ensure required data
 			if(typeof this.data.tit == "undefined") { console.error(" Videos Require Titles (tit) "); this.data.tit = "Cades <3 Lavender"; }
-			if(typeof this.data.vid == "undefined") { console.error(" Videos Require Embed IDs (vid) "); this.data.vid = "QIFn0wqZx7Y"; }
+			if(typeof this.data.vid == "undefined") { console.error(" Videos Require Embed IDs (vid) "); this.data.vid = "hrm--B9OT6c"; }
 			if(typeof this.data.pro == "undefined") { console.error(" Videos Require Providers (pro) "); this.data.pro = "youtube"; }
 			this.emit("init");
 
