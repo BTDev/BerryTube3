@@ -6,7 +6,9 @@
 
 events = require('events');
 
-module.exports = function(config,Video){
+module.exports = function(bt,Video){
+
+	var config = bt.config
 
 	var importer = new events.EventEmitter;
 	importer.processors = [];
@@ -31,6 +33,7 @@ module.exports = function(config,Video){
 				}
 			}
 		}
+		if(callback)callback(null);
 	}
 
 	

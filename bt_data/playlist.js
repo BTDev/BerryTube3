@@ -6,8 +6,11 @@
 
 events = require('events');
 
-module.exports = function(config,playlistdb,Video){
+module.exports = function(bt,Video){
 
+	//bt.config,bt.db.playlist,Video
+	var config = bt.config
+	var playlistdb = bt.db.playlist
 
 	var playlist = new events.EventEmitter;
 	playlist.db = playlistdb;
@@ -117,12 +120,24 @@ module.exports = function(config,playlistdb,Video){
 
 	}
 
+	playlist.autoSave = function(interval){
+
+		if(!interval && playlist._autoSave){
+			clearInterval(playlist._autoSave);
+			return;
+		}
+		playlist._autoSave = setInterval(function(){
+			playlist.save();
+		},interval);
+
+	}
+
 	playlist.save = function(callback){
 		var self = this;
 		var flat = [];
 		var elem = playlist._first;
 		for(var i=0;i<playlist._length;i++){
-			console.log(elem);
+			//console.log(elem);
 			//elem.video.save();  This should be insured by the new add function save wrap.
 			flat[i] = (elem.video.data._id);
 			elem = elem.next;
@@ -183,6 +198,18 @@ module.exports = function(config,playlistdb,Video){
 
 	playlist.get = function(videoid){
 		return playlist._lookup[videoid];
+	}
+
+	playlist.getAll = function(){
+		console.log(playlist);
+		var flat = [];
+		var elem = playlist._first;
+		for(var i=0;i<playlist._length;i++){
+			flat[i] = (elem.video.data);
+			console.log(flat[i]);
+			elem = elem.next;
+		} 
+		return flat;
 	}
 
 	//playlist.load(db);

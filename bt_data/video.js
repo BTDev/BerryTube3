@@ -3,7 +3,11 @@ var Datastore = require('nedb');
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-module.exports = function(config,db){
+module.exports = function(bt){
+
+	//bt.config,bt.db.video
+	var config = bt.config;
+	var db = bt.db.video;
 
 	/*
 

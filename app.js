@@ -24,24 +24,27 @@ for(var i in bt.db){
 
 // Configure Playlist Controls
 // Create Base Video Constructor
-var Video = require('./bt_data/video.js')(bt.config,bt.db.video);
+var Video = require('./bt_data/video.js')(bt);
 // Load playlist and IO Modules
-bt.playlist = require('./bt_data/playlist.js')(bt.config,bt.db.playlist,Video);
-bt.playlistIO = require('./bt_data/io/playlistIO.js')(bt.config,bt.playlist,bt.io);
+bt.playlist = require('./bt_data/playlist.js')(bt,Video);
+bt.playlistIO = require('./bt_data/io/playlistIO.js')(bt);
 bt.playlist.load();
+bt.playlist.autoSave(1000 * 10);
 
 // Load importer
-bt.importer = require('./bt_data/importer.js')(bt.config,Video);
+bt.importer = require('./bt_data/importer.js')(bt,Video);
 
 // do a thing
 bt.playlist.on("load",function(){
 	console.log("Loaded");
+	/*
 	bt.importer.getVideo('https://www.youtube.com/watch?v=QIFn0wqZx7Y',function(video){
-		console.log(video,'main!');
+		//console.log(video,'main!');
 		bt.playlist.add(null,video,function(){
 			bt.playlist.save();
 		});	
 	})
+	*/
 });
 
 
@@ -56,3 +59,4 @@ bt.web.get('/',require('./routes/index.js'));
 
 // Start Server
 bt.server.listen(3000);
+
