@@ -28,8 +28,9 @@ module.exports = function(grunt) {
 					'www/src/js/vendor/jquery.js',
 					'www/src/js/vendor/jquery-ui.js',
 					'www/src/js/*.js',
+					'!www/src/js/bootloader.js',
 				],
-				dest: 'www/dist/js/site.js'
+				dest: 'www/dist/js/deferred.js'
 			},
 		},
 		uglify: {
@@ -39,7 +40,8 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'www/dist/js/site.min.js': ['www/dist/js/site.js']
+					'www/dist/js/deferred.min.js': ['www/dist/js/deferred.js'],
+					'www/dist/js/bootloader.min.js': ['www/src/js/bootloader.js'],
 				},
 				mangle: false,
 				banner: headerString
