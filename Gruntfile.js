@@ -104,7 +104,7 @@ module.exports = function(grunt) {
 		},
 		copy: {
 			dist: {
-				cwd: 'src',
+				cwd: srcdir,
 				src: [ 
 					'**',
 					'!**/*.styl',
@@ -112,7 +112,8 @@ module.exports = function(grunt) {
 					'!**/*.jade',
 					'!**/*.js',
 					//'**/*.min.js',
-					'!**/elements/**'
+					'!**/elements/**',
+					
 				],
 				dest: distdir,
 				expand: true
