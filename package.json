@@ -1,0 +1,23 @@
+{
+  "name": "BerryTube",
+  "version": "3.0.0",
+  "description": "The chaos",
+  "main": "app.js",
+  "author": "BT Dev Team",
+  "license": "ISC",
+  "private":true,
+  "dependencies": {
+    "nedb": "*",
+    "socket.io": "*",
+    "express": "*",
+    "jade":"*",
+    "grunt": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-jade": "*",
+    "grunt-contrib-stylus": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-concat": "*"
+  }
+}

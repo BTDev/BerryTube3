@@ -1,5 +1,14 @@
+// Tools
+var path = require('path');
+
 var bt = {} // Let there be light.
 bt.config = require('./bt_data/config.js');
+
+// Setup Net Services
+bt.express = require('express');
+bt.web = bt.express();
+bt.server = require('http').Server(bt.web);
+bt.io = require('socket.io')(bt.server);
 
 // Setup Database
 var Datastore = require('nedb');
@@ -14,10 +23,11 @@ for(var i in bt.db){
 }
 
 // Configure Playlist Controls
-
+// Create Base Video Constructor
 var Video = require('./bt_data/video.js')(bt.config,bt.db.video);
-// Load playlist
+// Load playlist and IO Modules
 bt.playlist = require('./bt_data/playlist.js')(bt.config,bt.db.playlist,Video);
+bt.playlistIO = require('./bt_data/io/playlistIO.js')(bt.config,bt.playlist,bt.io);
 bt.playlist.load();
 
 // Load importer
@@ -35,32 +45,14 @@ bt.playlist.on("load",function(){
 });
 
 
-/*
+// Configure Web Provider
+bt.web.engine('jade', require('jade').__express);
+bt.web.set('views', __dirname + '/www/views')
+bt.web.set('view engine', 'jade')
+bt.web.use(bt.express.static(__dirname + '/www/dist'));
 
-bt.playlist.on("load",function(){
-	bt.playlist.save();
-});
+// ATTACH ROUTES HERE
+bt.web.get('/',require('./routes/index.js'));
 
-bt.playlist.on("save",function(){
-	console.log("Saved");
-});
-
-bt.playlist.load();
-*/
-
-/*
-for(var i=0;i<100;i++){
-	(function(i){
-		var v = new Video();
-		v.data.tit = "Episode "+i;
-		v.save(function(){
-			//console.log(v);
-			bt.playlist.add(null,v);	
-		});
-	})(i)
-}
-
-setTimeout(function(){bt.playlist.save();},3000);
-*/
-//setTimeout(function(){console.log(bt.playlist);},3000);
-//v.save();
+// Start Server
+bt.server.listen(3000);
