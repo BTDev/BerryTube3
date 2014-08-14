@@ -60,7 +60,7 @@ require(['socket','eventEmitter'],function(){
 	}
 
 	/// Hook Socket events
-	bt.socket.on('pl:add', function (data) 		{ console.log("GOT BACK",data); playlist.add(data); } );
+	bt.socket.on('pl:add', function (data) 		{ playlist.add(data); } );
 	bt.socket.on('pl:getall', function (data) 	{ playlist.getall(data); } );
 
 	// Any initial events
