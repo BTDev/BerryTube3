@@ -2,8 +2,12 @@ doctype html
 html
 	head#head
 		title BerryTube3 :: I couldn't stop it if i tried
-		script(src="js/bootloader.min.js" async="true")
+		link(href='css/jquery-ui.css', rel='stylesheet')
+		link(href='css/main.css', rel='stylesheet')
+		script(src='js/bootloader.min.js' async='true')
 	body
 		div.root
+			include ./elements/playlist.jade
 			p.
 				#{title} BOOP done.
+			img.svg(src='img/tada.svg')

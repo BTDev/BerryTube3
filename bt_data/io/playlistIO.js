@@ -14,7 +14,12 @@ module.exports = function(bt){
 
 		// Emit Playlist additions.
 		playlist.on("add",function(after,video){
-			io.emit("pl:add",video);
+
+			var data = {};
+			if(video && video.data) data.video = video.data; // lol fuck you
+			if(after && after.data) data.after = after.data; // lol fuck you
+			io.emit("pl:add",data);
+
 		})
 
 	});

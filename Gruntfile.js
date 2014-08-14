@@ -7,6 +7,7 @@ module.exports = function(grunt) {
 	var fileHeaders = {
 		"Project":'<%= pkg.name %> <%= pkg.version %> ',
 		"Last dist":'<%= grunt.template.today("isoDateTime") %>',
+		"ATTENTION MODDERS":'Do not bother trying to de-minify this code! The project is hosted on https://github.com/BTDev/BerryTube and contains the source files. Use those!',
 	};
 	var headerString = '';
 	var hs = [];
@@ -65,43 +66,43 @@ module.exports = function(grunt) {
 			scripts: {
 				files: [srcdir+'/**/*.js','!**/node_modules/**'],
 				tasks: ['uglify'],
-			    options: {
-			      livereload: true,
-			    }
+				options: {
+				  livereload: true,
+				}
 			},
 			stylus: {
 				files: [srcdir+'/**/*.styl','src/**/*.css','!**/node_modules/**'],
 				tasks: ['stylus'],
-			    options: {
-			      livereload: true,
-			    }
+				options: {
+				  livereload: true,
+				}
 			},
 			jade: {
 				files: [srcdir+'/**/*.jade','!**/node_modules/**'],
 				tasks: ['jade'],
-			    options: {
-			      livereload: true,
-			    }
+				options: {
+				  livereload: true,
+				}
 			},
 			copy: {
 				files: [ srcdir+'/**', '!'+srcdir+'/**/*.styl', '!'+srcdir+'/**/*.css', '!'+srcdir+'/**/*.jade' ,'!**/node_modules/**'],
 				tasks: ['copy'],
 				options: {
-			      event: ['changed'],
-			    },
-			    options: {
-			      livereload: true,
-			    }
+				  event: ['changed'],
+				},
+				options: {
+				  livereload: true,
+				}
 			},
 			dist: {
 				files: [ srcdir+'/**', '!'+srcdir+'/**/*.styl', '!'+srcdir+'/**/*.css', '!'+srcdir+'/**/*.jade' ,'!**/node_modules/**'],
 				tasks: ['build'],
 				options: {
-			      event: ['added', 'deleted'],
-			    },
-			    options: {
-			      livereload: true,
-			    }
+				  event: ['added', 'deleted'],
+				},
+				options: {
+				  livereload: true,
+				}
 			},
 		},
 		copy: {
@@ -125,6 +126,31 @@ module.exports = function(grunt) {
 			dist: {
 				src: [ distdir ]
 			},
+		},
+		svgmin: {                       // Task
+			options: {                  // Configuration that will be passed directly to SVGO
+				plugins: [{
+					removeViewBox: false
+				}, {
+					removeUselessStrokeAndFill: false
+				}, {
+					cleanupIDs: false
+				}, {
+					convertPathData: { 
+						straightCurves: false // advanced SVGO plugin option
+					}
+				}]
+			},
+			dist: {                     // Target
+				files: [{               // Dictionary of files
+					expand: true,       // Enable dynamic expansion.
+					cwd: srcdir,     // Src matches are relative to this path.
+					src: ['**/*.svg'],  // Actual pattern(s) to match.
+					dest: distdir,       // Destination path prefix.
+					ext: '.svg'     // Dest filepaths will have this extension.
+					// ie: optimise img/src/branding/logo.svg and store it in img/branding/logo.min.svg
+				}]
+			}
 		}
 	});
 
@@ -135,6 +161,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-svgmin');
 	
 	// Default task(s).
 	grunt.registerTask('default', "testing", function(){
@@ -148,6 +175,7 @@ module.exports = function(grunt) {
 		grunt.task.run('copy');
 		grunt.task.run('uglify');
 		grunt.task.run('stylus');
+		grunt.task.run('svgmin');
 	});
 
 };

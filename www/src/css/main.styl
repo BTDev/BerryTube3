@@ -1,4 +1,36 @@
+// MIXINS
+ 
+vendor(prop, args)
+	-webkit-{prop} args
+	-moz-{prop} args
+	-o-{prop} args
+	{prop} args
+
+animation()
+	vendor('animation', arguments)
+
+// STYLES
+
 .root
 	width 900px
 	margin 0 auto
-	background red
+
+img
+	border 1px solid
+
+#beam1
+	animation: blinky 7s infinite;
+
+#beam2
+	animation: blinky 11s infinite;
+
+#beam3
+	animation: blinky 13s infinite;
+
+@keyframes blinky 
+	0%
+		fill #000000
+	50%
+		fill #ffffff
+	100%
+		fill #000000
