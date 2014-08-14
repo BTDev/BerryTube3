@@ -18,7 +18,8 @@ module.exports = function(bt){
 			var data = {};
 			if(video && video.data) data.video = video.data; // lol fuck you
 			if(after && after.data) data.after = after.data; // lol fuck you
-			io.emit("pl:add",data);
+			console.log("emit",data);
+			io.sockets.emit("pl:add",data);
 
 		})
 
@@ -31,15 +32,16 @@ module.exports = function(bt){
 		// Playlist Add Event
 		socket.on("pl:add",function(data){
 			bt.importer.getVideo(data.url,function(nv){
-				console.log(nv);
-				if(nv){ console.log("ok",data.url); playlist.add(null,nv); }
-				else { console.log("bad",data.url); socket.emit('bt:err','No U'); }
+				console.log(data);
+				//console.log(nv);
+				if(nv){ playlist.add(null,nv); }
+				else { socket.emit('bt:err','No U'); }
 			});
 		});
 
 		socket.on("pl:getall",function(){
 			var broadcastableArray = playlist.getAll();
-			console.log(broadcastableArray);
+			//console.log(broadcastableArray);
 			io.emit("pl:getall",broadcastableArray);
 		});
 

@@ -11,6 +11,7 @@ $(function(){
 
 	});
 
+	/*
 	require(['playlist'],function(){
 		bt.playlist.on("load",function(){
 			console.log("playlist loaded!");
@@ -19,5 +20,6 @@ $(function(){
 			console.log(data);
 		})
 	});
+	*/
 
 })

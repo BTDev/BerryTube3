@@ -201,12 +201,12 @@ module.exports = function(bt,Video){
 	}
 
 	playlist.getAll = function(){
-		console.log(playlist);
+		//console.log(playlist);
 		var flat = [];
 		var elem = playlist._first;
 		for(var i=0;i<playlist._length;i++){
 			flat[i] = (elem.video.data);
-			console.log(flat[i]);
+			//console.log(flat[i]);
 			elem = elem.next;
 		} 
 		return flat;

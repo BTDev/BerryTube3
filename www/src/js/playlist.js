@@ -4,6 +4,7 @@ require(['socket','eventEmitter'],function(){
 	// Inherit from eventEmitter
 	var playlist = new bt.eventEmitter();
 	playlist.dom = $("#playlist");
+	playlist.list = $("#playlist .list");
 
 	// Define Methods
 	playlist.add = function(data,callback){
@@ -21,8 +22,8 @@ require(['socket','eventEmitter'],function(){
 		var _title = $("<div/>").addClass("title").text(data.video.tit).appendTo(newEntry);
 		
 		// Finish Up
-		playlist.dom.append(newEntry);
-		callback(data);
+		playlist.list.append(newEntry);
+		if(callback)callback(data);
 		this.emit("add",data);
 
 	}
@@ -30,7 +31,7 @@ require(['socket','eventEmitter'],function(){
 	playlist.getall = function(data,callback){
 
 		var self = this;
-		playlist.dom.children().remove(); // yeah, fuck you
+		playlist.list.children().remove(); // yeah, fuck you
 		
 		// Async Queue of all videos
 		/* 
@@ -59,7 +60,7 @@ require(['socket','eventEmitter'],function(){
 	}
 
 	/// Hook Socket events
-	bt.socket.on('pl:add', function (data) 		{ playlist.add(data); } );
+	bt.socket.on('pl:add', function (data) 		{ console.log("GOT BACK",data); playlist.add(data); } );
 	bt.socket.on('pl:getall', function (data) 	{ playlist.getall(data); } );
 
 	// Any initial events
