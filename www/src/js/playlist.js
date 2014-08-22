@@ -4,6 +4,7 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 	// Inherit from eventEmitter
 	var playlist = new bt.eventEmitter();
 	playlist.dom = $("#playlist");
+	playlist.frame = $("#playlist .frame");
 	playlist.list = $("#playlist .list");
 
 	// Define Methods
@@ -12,7 +13,10 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 
 		/// TODO: Needs to check for data.after for queues. null = end of list.
 		if(!data.video)return;
-		var newEntry = $("<div/>")
+		var newEntry = $("<div/>");
+
+		// Class
+		newEntry.addClass("track");
 
 		// Attrs
 		newEntry.attr("id",data.video._id);
@@ -23,8 +27,7 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 		var _title = $("<div/>").addClass("title").text(data.video.tit).appendTo(newEntry);
 		
 		// Fix Scrollbar
-		playlist.list.perfectScrollbar('update');
-		//playlist.jsp.reinitialise();
+		playlist.scrollbar.update();
 
 		// Finish Up
 		playlist.list.append(newEntry);
@@ -92,12 +95,12 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 	});
 
 	// Attach Fancy Scrollbar
-	playlist.list.perfectScrollbar({
-		wheelSpeed: 20,
-		wheelPropagation: true,
-		minScrollbarLength: 20
+	playlist.frame.tinyscrollbar({
+		wheelSpeed:200,
+		thumbSize: 20
 	});
-
+	playlist.scrollbar = playlist.frame.data("plugin_tinyscrollbar");
+	
 	// Any initial events
 	bt.socket.emit('pl:getall'); // Get Playlist
 

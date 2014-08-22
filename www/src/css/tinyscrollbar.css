@@ -1,0 +1,9 @@
+/* Tiny Scrollbar */
+#playlist .viewport { height: 200px; overflow: hidden; position: relative; }
+#playlist .overview { list-style: none; position: absolute; left: 0; right: 0; top: 0; padding: 0; margin: 0; }
+#playlist .scrollbar { position: relative; background-position: 0 0; float: right; width: 15px; }
+#playlist .scrollbar .track { border-left: 1px solid; height: 100%; width:13px; position: relative; padding: 0 1px; }
+#playlist .scrollbar .thumb {  height: 20px; width: 25px; cursor: pointer; overflow: hidden; position: absolute; top: 0; left: 0; }
+#playlist .scrollbar .thumb .end { overflow: hidden; height: 5px; width: 25px; }
+#playlist .disable { display: none; }
+.noSelect { user-select: none; -o-user-select: none; -moz-user-select: none; -khtml-user-select: none; -webkit-user-select: none; }
