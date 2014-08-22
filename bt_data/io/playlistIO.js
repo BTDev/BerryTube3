@@ -18,7 +18,6 @@ module.exports = function(bt){
 			var data = {};
 			if(video && video.data) data.video = video.data; // lol fuck you
 			if(after && after.data) data.after = after.data; // lol fuck you
-			console.log("emit",data);
 			io.sockets.emit("pl:add",data);
 
 		})
@@ -31,12 +30,9 @@ module.exports = function(bt){
 
 		// Playlist Add Event
 		socket.on("pl:add",function(data){
-			console.log("trying",data);
 			bt.importer.getVideo(data.url,function(nv){
-				console.log(data);
-				//console.log(nv);
 				if(nv){ playlist.add(null,nv); }
-				else { console.log("no importer found"); socket.emit('bt:err','No U'); }
+				else { socket.emit('bt:err','No U'); }
 			});
 		});
 

@@ -27,9 +27,9 @@ module.exports = function(bt,Video){
 				//console.log("trying",luckyBastard.matches[j]);
 				var m = new RegExp(luckyBastard.matches[j],'i');
 				if(m.test(url)){
-					console.log("Matched!",luckyBastard.name);
+					//console.log("Matched!",luckyBastard.name);
 					luckyBastard.getVideo(url,function(err,video){
-						console.log("Retrieved!",video);
+						//console.log("Retrieved!",video);
 						if(callback)callback(video);
 					});
 					return;

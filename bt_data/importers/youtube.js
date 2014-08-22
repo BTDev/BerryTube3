@@ -1,4 +1,5 @@
 var https = require('https');
+var querystring = require('querystring');
 
 module.exports = function(config,Video){
 
@@ -11,15 +12,16 @@ module.exports = function(config,Video){
 		var videoid = '';
 		var pattern = new RegExp('http[s]{0,1}.*youtu(?:.be\\\/|be.com\\\/watch\\\?v=)([^\\\?\\\&]*)','i');
 		var match = pattern.exec(url);
+		console.log("match",match);
 		if(!match){
 			if(callback)callback("This Invalid URL parsing regex!",null);
 			return;
 		}
 
 		var httpopts = processor.genUrl({
-			id:match,
-			key:'AIzaSyBBM2fo32Pzrcf0GHO5LnEHxjYd1T1li-Q',
-			part:['snippet','contentDetails']
+			id:match[1],
+			key:'AIzaSyBBM2fo32Pzrcf0GHO5LnEHxjYd1T1li-Q', // Hey GITHUB people, dont be shitty and steal this id plz. 
+			part:'snippet,contentDetails'
 		});
 		processor.get(httpopts,function(data){
 			var newvid = new Video();
@@ -42,23 +44,10 @@ module.exports = function(config,Video){
 	};
 
 	processor.genUrl = function(data){
-		var urlBits = [];
-		for(var i in data){
-			if(typeof data[i] == "string"){
-				urlBits.push(i+"="+data[i]); 
-			} else {
-				var ittybit = [];
-				for(var j in data[i]){
-					ittybit.push(data[i][j]);
-				}
-				urlBits.push(i+"="+ittybit.join(",")); 
-			}
-			
-		}
 		var ret = {
 			hostname:processor.baseUrl.hostname,
 			port:processor.baseUrl.port,
-			path:processor.baseUrl.path + "?" + urlBits.join("&"),
+			path:processor.baseUrl.path + "?" + querystring.stringify(data), //  Thanks Cyzon!
 			method:processor.baseUrl.method,
 		}
 		return ret;
