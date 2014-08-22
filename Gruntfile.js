@@ -28,6 +28,8 @@ module.exports = function(grunt) {
 				src: [
 					'www/src/js/vendor/jquery.js',
 					'www/src/js/vendor/jquery-ui.js',
+					'www/src/js/vendor/jquery.mousewheel.js',
+					'www/src/js/vendor/perfect-scrollbar.js',
 					'www/src/js/*.js',
 					'!www/src/js/bootloader.js',
 				],

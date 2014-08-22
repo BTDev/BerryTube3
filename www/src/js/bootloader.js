@@ -15,9 +15,23 @@ window.require = function(modules,callback,wait){ // Lets modules Require other 
 	// Ensure defined modules
 	var pass = true;
 	for(var i in modules){
-		if(!(modules[i] in window.bt) || typeof window.bt[modules[i]] == "undefined" || !window.bt[modules[i]]){
-			pass = false;
-			break;
+
+		// If the item starts with anything except a-zA-Z we assume its a dom selector
+		if(/^[a-zA-Z]/.test(modules[i])){
+			if(!(modules[i] in window.bt) || typeof window.bt[modules[i]] == "undefined" || !window.bt[modules[i]]){
+				pass = false;
+				break;
+			}
+		} else {
+			// ensure jquery is loaded
+			if(typeof jQuery == "undefined"){
+				pass=false;
+				break;
+			}
+			if(!$(modules[i]).length){
+				pass=false;
+				break;
+			}
 		}
 	}
 

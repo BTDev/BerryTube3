@@ -31,11 +31,12 @@ module.exports = function(bt){
 
 		// Playlist Add Event
 		socket.on("pl:add",function(data){
+			console.log("trying",data);
 			bt.importer.getVideo(data.url,function(nv){
 				console.log(data);
 				//console.log(nv);
 				if(nv){ playlist.add(null,nv); }
-				else { socket.emit('bt:err','No U'); }
+				else { console.log("no importer found"); socket.emit('bt:err','No U'); }
 			});
 		});
 

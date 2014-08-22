@@ -24,9 +24,12 @@ module.exports = function(bt,Video){
 		for(var i in importer.processors){
 			var luckyBastard = importer.processors[i];
 			for(var j in luckyBastard.matches){
+				//console.log("trying",luckyBastard.matches[j]);
 				var m = new RegExp(luckyBastard.matches[j],'i');
 				if(m.test(url)){
+					console.log("Matched!",luckyBastard.name);
 					luckyBastard.getVideo(url,function(err,video){
+						console.log("Retrieved!",video);
 						if(callback)callback(video);
 					});
 					return;
