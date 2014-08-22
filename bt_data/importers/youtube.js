@@ -1,7 +1,8 @@
 var https = require('https');
 var querystring = require('querystring');
+var Datastore = require('nedb');
 
-module.exports = function(config,Video){
+module.exports = function(bt,Video){
 
 	var processor = {};
 	// REQUIRED
@@ -12,36 +13,56 @@ module.exports = function(config,Video){
 		var videoid = '';
 		var pattern = new RegExp('http[s]{0,1}.*youtu(?:.be\\\/|be.com\\\/watch\\\?v=)([^\\\?\\\&]*)','i');
 		var match = pattern.exec(url);
-		console.log("match",match);
 		if(!match){
 			if(callback)callback("This Invalid URL parsing regex!",null);
 			return;
 		}
 
-		var httpopts = processor.genUrl({
-			id:match[1],
-			key:'AIzaSyBBM2fo32Pzrcf0GHO5LnEHxjYd1T1li-Q', // Hey GITHUB people, dont be shitty and steal this id plz. 
-			part:'snippet,contentDetails'
+		// take out id
+		var videoid = match[1];
+
+		// check cache
+		processor.db.findOne({ id:videoid }, function (err, doc) {
+			if(doc){
+				// Yay a cached version.
+				processor.add(doc,callback);
+			} else {
+				var httpopts = processor.genUrl({
+					id:videoid,
+					key:'AIzaSyBBM2fo32Pzrcf0GHO5LnEHxjYd1T1li-Q', // Hey GITHUB people, dont be shitty and steal this id plz. 
+					part:'snippet,contentDetails'
+				});
+				processor.get(httpopts,function(data){
+					// Add to cache
+					processor.db.insert(data)
+					processor.add(data,callback);
+				});
+			}
 		});
-		processor.get(httpopts,function(data){
-			var newvid = new Video();
-			newvid.data.tit = data.snippet.title;
-			newvid.data.vid = data.id;
-			newvid.data.pro = processor.handle;
-			newvid.data.len = processor.parseDuration(data.contentDetails.duration);
-			if(callback)callback(null,newvid);
-		});
+
+		
 
 	}
 
 
 	// Internals
+	processor.db = new Datastore({ filename: bt.config.dbinfo._dir+"ytcache.db", autoload: true });
+	processor.db.persistence.setAutocompactionInterval(1000*60*60);
 	processor.baseUrl = {
 		hostname:'www.googleapis.com',
 		port:443,
 		path:'/youtube/v3/videos',
 		method: 'GET'
 	};
+
+	processor.add = function(data,callback){
+		var newvid = new Video();
+		newvid.data.tit = data.snippet.title;
+		newvid.data.vid = data.id;
+		newvid.data.pro = processor.handle;
+		newvid.data.len = processor.parseDuration(data.contentDetails.duration);
+		if(callback)callback(null,newvid);
+	}
 
 	processor.genUrl = function(data){
 		var ret = {

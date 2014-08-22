@@ -15,9 +15,9 @@ var Datastore = require('nedb');
 bt.db = {};
 
 // Enumerate
-bt.db.user = new Datastore({ filename: bt.config.dbinfo.user.path, autoload: true });
-bt.db.playlist = new Datastore({ filename: bt.config.dbinfo.playlist.path, autoload: true });
-bt.db.video = new Datastore({ filename: bt.config.dbinfo.video.path, autoload: true });
+bt.db.user = new Datastore({ filename: bt.config.dbinfo._dir+bt.config.dbinfo.user.path, autoload: true });
+bt.db.playlist = new Datastore({ filename: bt.config.dbinfo._dir+bt.config.dbinfo.playlist.path, autoload: true });
+bt.db.video = new Datastore({ filename: bt.config.dbinfo._dir+bt.config.dbinfo.video.path, autoload: true });
 for(var i in bt.db){
 	bt.db[i].persistence.setAutocompactionInterval(bt.config.dbinfo[i].aci);
 }

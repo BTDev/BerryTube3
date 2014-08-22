@@ -8,15 +8,13 @@ events = require('events');
 
 module.exports = function(bt,Video){
 
-	var config = bt.config
-
 	var importer = new events.EventEmitter;
 	importer.processors = [];
 
 	// We need to now import all video processors
 	require("fs").readdirSync("./bt_data/importers").forEach(function(file) {
 		if(file.substring(file.length-3) == ".js"){
-			importer.processors.push(require("./importers/" + file)(config,Video));
+			importer.processors.push(require("./importers/" + file)(bt,Video));
 		}
 	});
 
