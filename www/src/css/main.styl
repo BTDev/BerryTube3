@@ -3,11 +3,15 @@
 vendor(prop, args)
 	-webkit-{prop} args
 	-moz-{prop} args
+	-ms-{prop} args
 	-o-{prop} args
 	{prop} args
 
 animation()
 	vendor('animation', arguments)
+
+user-select()
+	vendor('user-select', arguments)
 
 // STYLES
 
@@ -45,3 +49,10 @@ img
 	overflow hidden
 	height 100%
 	position relative
+
+#playlist .list .track
+	cursor pointer
+
+#playlist .list .track .title
+	user-select none
+	cursor inherit
