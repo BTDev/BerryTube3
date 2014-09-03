@@ -8,10 +8,10 @@ module.exports = function(bt,Video){
 	// REQUIRED
 	processor.name = "Youtube";
 	processor.handle = "youtube";
-	processor.matches = ['http[s]{0,1}.*youtube.com\\\/watch\\\?v=.+','http[s]{0,1}.*youtu.be\\\/.+'];
+	processor.matches = ['https?.*youtube.com\\\/watch\\\?v=.+','https?.*youtu.be\\\/.+'];
 	processor.getVideo = function(url, callback){
 		var videoid = '';
-		var pattern = new RegExp('http[s]{0,1}.*youtu(?:.be\\\/|be.com\\\/watch\\\?v=)([^\\\?\\\&]*)','i');
+		var pattern = new RegExp('https?.*youtu(?:.be\\\/|be.com\\\/watch\\\?v=)([^\\\?\\\&]*)','i');
 		var match = pattern.exec(url);
 		if(!match){
 			if(callback)callback("This Invalid URL parsing regex!",null);
