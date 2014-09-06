@@ -37,6 +37,7 @@ bt.importer = require('./bt_data/importer.js')(bt,Video);
 // do a thing
 bt.playlist.on("load",function(){
 	console.log("Loaded");
+	bt.playlist.init();
 	/*
 	bt.importer.getVideo('https://www.youtube.com/watch?v=QIFn0wqZx7Y',function(video){
 		//console.log(video,'main!');

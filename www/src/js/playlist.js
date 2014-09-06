@@ -7,6 +7,7 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 	playlist.frame = $("#playlist .frame");
 	playlist.list = $("#playlist .list");
 
+
 	// Define Methods
 
 	playlist.recv_add = function(data,callback){
@@ -38,7 +39,6 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 
 	playlist.send_add = function(url,callback){
 
-
 		if(!url)return;
 		console.log('emitting','pl:add',url);
 		bt.socket.emit("pl:add",{
@@ -47,26 +47,32 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 
 	}
 
+	playlist.setActive = function(videoid){
+		//console.log(videoid);
+		playlist.list.find(".active").removeClass("active");
+		$("#"+videoid).addClass("active");
+		this.emit("setactive",{videoid:videoid});
+	}
+
 	playlist.getall = function(data,callback){
 
 		var self = this;
+		var videos = data.videos;
+		var active = data.activeid;
 		playlist.list.children().remove(); // yeah, fuck you
 		
-		// Async Queue of all videos
+		// Async Queue of all videos 
 		/* 
 			Im not 100% on the science, but i feel like doing this async
 			makes the page lockup less than a for() would. Also allows 
 			playlist.add to be async later in life if it chooses to
 			like the proud black woman it is.
 		*/
-		var done = function(){
-			self.emit("load");
-		}
 		var deque = function(){
-			var video = data.shift();
+			var video = videos.shift();
 			if(!video){	done();	return;	}
 			playlist.recv_add({video:video},function(){	// Add to playlist
-				if(data.length > 0){		// Check queue
+				if(videos.length > 0){		// Check queue
 					deque();
 				} else {
 					done();
@@ -74,13 +80,30 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 			});
 
 		}
+		var done = function(){
+			playlist.setActive(active);
+			self.emit("load",{videoid:active});
+		}
 		deque();
 
+	}
+
+	// return active video id
+	playlist.getActive = function(){
+		return playlist.list.find(".active").attr("id"); //should this really do a dom lookup, or should it keep the answer in memory?
+	}
+
+	playlist.jump = function(data){
+		console.log("jump not fully yet implemented",data);
+		var videoid = data.videoid;
+		playlist.setActive(videoid);
+		this.emit("jump",{videoid:videoid});
 	}
 
 	/// Hook Socket events
 	bt.socket.on('pl:add', function (data) 		{ playlist.recv_add(data); } );
 	bt.socket.on('pl:getall', function (data) 	{ playlist.getall(data); } );
+	bt.socket.on('pl:jump', function (data) 	{ playlist.jump(data); } );
 
 	/// Attach DOM events
 	$("#playlist .queue").keypress(function(e) {

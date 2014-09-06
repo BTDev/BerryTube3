@@ -20,7 +20,30 @@ module.exports = function(bt){
 			if(after && after.data) data.after = after.data; // lol fuck you
 			io.sockets.emit("pl:add",data);
 
-		})
+		});
+
+		// TODO 
+		/*
+			Right now the server playlist module handles all video operations and playlist operations.
+			I'm not sure if i want to keep it this way, but the server dosnt actually have any concept of 
+			a video player, so decoupling them seems over complicated, opposed to just having the
+			playlist io send video events.
+		*/
+		playlist.on("seek",function(data){
+			io.sockets.emit("vi:seek",data);
+		});
+
+		playlist.on("play",function(data){
+			io.sockets.emit("vi:play",data);
+		});
+
+		playlist.on("stop",function(data){
+			io.sockets.emit("vi:stop",data);
+		});
+
+		playlist.on("jump",function(data){
+			io.sockets.emit("pl:jump",data);
+		});
 
 	});
 
@@ -39,7 +62,10 @@ module.exports = function(bt){
 		socket.on("pl:getall",function(){
 			var broadcastableArray = playlist.getAll();
 			//console.log(broadcastableArray);
-			io.emit("pl:getall",broadcastableArray);
+			io.emit("pl:getall",{
+				activeid:playlist._active.video._id,
+				videos:broadcastableArray
+			});
 		});
 
 

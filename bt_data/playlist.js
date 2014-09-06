@@ -21,6 +21,12 @@ module.exports = function(bt,Video){
 	playlist._length = 0;
 	playlist._lookup = {};
 
+	// Time Props
+	playlist.time = {};
+	playlist.time.current = -1 * (config.playlist.prevideo);
+	playlist.time.last = new Date().getTime();
+	playlist.time.playing = true;
+
 	// Linked List Object
 
 	playlist.add = function(after,video,callback){
@@ -211,6 +217,71 @@ module.exports = function(bt,Video){
 		} 
 		return flat;
 	}
+
+	// Time functions
+	playlist.seek = function(to){
+		playlist.time.current = to;
+		console.log("Got seek to",to,"should emit update to time",playlist.time.current);
+		this.emit("seek",{
+			to:to
+		});
+	}
+
+	playlist.play = function(){
+		playlist.time.playing = true;
+		console.log("Got play, should emit play at time",playlist.time.current);
+		this.emit("play");
+	}
+
+	playlist.stop = function(){
+		playlist.time.playing = false;
+		console.log("Got stop, should emit pause at time",playlist.time.current);
+		this.emit("stop");
+	}
+
+	playlist.jump = function(videoid){
+		var jumpto = playlist._lookup[videoid];
+		if(jumpto){
+			playlist.time.current = -1 * config.playlist.prevideo; // Not using seek to avoid duplicate events
+			playlist._active = jumpto;
+			console.log("Got jump, should emit jump to",playlist._active.video.data.tit);
+			this.emit("jump",{
+				to:playlist.time.current,
+				videoid:videoid
+			});
+		}
+	}
+
+	playlist.playNext = function(){
+		playlist.jump(playlist._active.next.video._id);
+	}
+
+	playlist.init = function(){
+		// Run internal clock.
+		setInterval(function(){
+
+			// Internal Clock should use Deltas instead of assuming 
+			// the 1000 millis wait lasted exactly 1000 millis every time.
+			var delta = new Date().getTime() - playlist.time.last;
+			if(playlist.time.playing){
+				playlist.time.current+=delta*1;	
+				var activemillis = playlist._active.video.data.len * 1000;
+				
+				var next = (playlist.time.current > (activemillis + config.playlist.postvideo));
+				//console.log( playlist.time.current / (activemillis + config.playlist.postvideo) * 100 );
+
+				// If we're done with this video and the post gutter, skip along.
+				if(next){
+					playlist.playNext();
+				}
+			}
+			playlist.time.last = new Date().getTime();
+
+		},1000);
+		playlist.play();
+	}
+
+	
 
 	//playlist.load(db);
 	//console.log(playlist);

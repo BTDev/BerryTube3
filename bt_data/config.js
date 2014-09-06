@@ -17,4 +17,13 @@ settings.dbinfo.video = {};
 settings.dbinfo.video.path = 'videos.db';
 settings.dbinfo.video.aci = 1000 * 60 * 5;
 
+
+// Playlist Config
+settings.playlist = {};
+
+settings.playlist.prevideo = 3000;
+settings.playlist.postvideo = 2000;
+
+
+// DONE
 module.exports = settings;
