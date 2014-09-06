@@ -30,6 +30,7 @@ module.exports = function(grunt) {
 					'www/src/js/vendor/jquery-ui.js',
 					'www/src/js/vendor/jquery.tinyscrollbar.js',
 					'www/src/js/*.js',
+					'www/src/js/players/*.js',
 					'!www/src/js/bootloader.js',
 				],
 				dest: 'www/dist/js/deferred.js'

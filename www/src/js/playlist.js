@@ -22,7 +22,7 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 		// Attrs
 		newEntry.attr("id",data.video._id);
 		newEntry.attr("data-provider",data.video.pro);
-		newEntry.attr("videoid",data.video.vid);
+		newEntry.attr("data-videoid",data.video.vid);
 
 		// Elems
 		var _title = $("<div/>").addClass("title").text(data.video.tit).appendTo(newEntry);
