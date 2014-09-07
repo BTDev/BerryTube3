@@ -52,7 +52,6 @@ module.exports = function(bt){
 				activeid:playlist._active.video._id,
 				pos:playlist.getTime(),
 			});
-			console.log("tick",new Date().getTime());
 		},5000)
 
 	});
@@ -60,7 +59,7 @@ module.exports = function(bt){
 	
 	// SOCKET REACTIONS
 	io.on('connection', function (socket) {
-
+		console.log("playlistIO Attached");
 		// Playlist Add Event
 		socket.on("pl:add",function(data){
 			bt.importer.getVideo(data.url,function(nv){

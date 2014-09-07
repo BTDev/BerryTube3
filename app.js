@@ -48,6 +48,8 @@ bt.playlist.on("load",function(){
 	*/
 });
 
+// Misc IO
+bt.miscIO = require('./bt_data/io/miscIO.js')(bt);
 
 // Configure Web Provider
 bt.web.engine('jade', require('jade').__express);

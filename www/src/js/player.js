@@ -64,7 +64,8 @@
 
 	}
 
-	player.seek = function(to){
+	player.seek = function(to,incorporate_lag){
+		if(incorporate_lag && bt.socket.avgping) to += bt.socket.avgping;
 		player.ensureProvider(function(){
 			player.activeProvider.seek(to);
 		});
@@ -114,7 +115,7 @@
 	}
 
 	/// Hook Socket events
-	bt.socket.on('vi:seek', function (data) 		{ player.seek(data);		} );
+	bt.socket.on('vi:seek', function (data) 		{ player.seek(data,true);		} );
 	bt.socket.on('vi:play', function (data) 		{ player.play(data);		} );
 	bt.socket.on('vi:stop', function (data) 		{ player.stop(data);		} );
 	bt.socket.on('vi:heartbeat', function (data) 	{ player.heartbeat(data);	} );
