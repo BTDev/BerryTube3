@@ -256,6 +256,10 @@ module.exports = function(bt,Video){
 		playlist.jump(playlist._active.next.video._id);
 	}
 
+	playlist.getTime = function(){
+		return playlist.time.current / 1000;
+	}
+
 	playlist.init = function(){
 		// Run internal clock.
 		setInterval(function(){

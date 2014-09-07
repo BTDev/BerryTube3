@@ -23,13 +23,22 @@
 		var id = data.id;
 		var pos = data.pos;
 
+		if(typeof provider == "undefined"){
+			console.log("Got an undefined provider");
+			console.trace();
+			return;
+		}
+
 		if(!timeout) timeout = 10;
 		timeout *= 1.1;
 		if(timeout > 10000) return;
 
 		// Check for provider match
 		if(player.activeProvider && player.activeProvider.handle == provider){
-			console.log("use existing",player.activeProvider);
+			player.activeProvider.play({
+				id:id,
+				pos:pos
+			})
 			return;
 		}
 
@@ -55,16 +64,48 @@
 
 	}
 
-	player.seek = function(data){
-		console.log("player","seek not yet implemented",data);
+	player.seek = function(to){
+		player.ensureProvider(function(){
+			player.activeProvider.seek(to);
+		});
 	}
 
 	player.play = function(data){
-		console.log("player","play not yet implemented",data);
+		player.ensureProvider(function(){
+			player.activeProvider.play(data);
+		});
 	}
 
 	player.stop = function(data){
 		console.log("player","stop not yet implemented",data);
+	}
+
+	player.ensureProvider = function(callback,timeout){
+		if(!timeout) timeout = 10;
+		timeout *= 1.1;
+		if(timeout > 10000) return;
+
+		if(!player.activeProvider){
+			setTimeout(function(){
+				player.ensureProvider(callback,timeout);
+			},timeout);
+			return;
+		}
+
+		if(callback)callback();
+	}
+
+	player.heartbeat = function(data,timeout){
+
+		// timeout
+		pos = data.pos;
+		player.activeProvider.getTime(function(time){
+			var diff = Math.abs(pos-time);
+			if(diff > 2){ // TODO: Use localstorage / User Account Module
+				player.seek(pos);
+			}
+		});
+
 	}
 
 	player.registerProvider = function(provider){
@@ -73,17 +114,18 @@
 	}
 
 	/// Hook Socket events
-	bt.socket.on('vi:seek', function (data) 	{ player.seek(data); } );
-	bt.socket.on('vi:play', function (data) 	{ player.play(data); } );
-	bt.socket.on('vi:stop', function (data) 	{ player.stop(data); } );
+	bt.socket.on('vi:seek', function (data) 		{ player.seek(data);		} );
+	bt.socket.on('vi:play', function (data) 		{ player.play(data);		} );
+	bt.socket.on('vi:stop', function (data) 		{ player.stop(data);		} );
+	bt.socket.on('vi:heartbeat', function (data) 	{ player.heartbeat(data);	} );
 
 	/// Hook local events
 	bt.playlist.on('setactive',function(data){
-		//console.log(data);
 		var id = data.videoid;
+		var pos = data.pos || -3;
 		player.loadByDomId({
 			id:id,
-			pos:0
+			pos:pos
 		});
 	});
 

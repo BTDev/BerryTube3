@@ -45,6 +45,16 @@ module.exports = function(bt){
 			io.sockets.emit("pl:jump",data);
 		});
 
+
+		// Heartbeat
+		setInterval(function(){
+			io.sockets.emit("vi:heartbeat",{
+				activeid:playlist._active.video._id,
+				pos:playlist.getTime(),
+			});
+			console.log("tick",new Date().getTime());
+		},5000)
+
 	});
 
 	
@@ -64,12 +74,13 @@ module.exports = function(bt){
 			//console.log(broadcastableArray);
 			io.emit("pl:getall",{
 				activeid:playlist._active.video._id,
+				pos:playlist.getTime(),
 				videos:broadcastableArray
 			});
 		});
 
-
 	});
+
 
 	return plio;
 

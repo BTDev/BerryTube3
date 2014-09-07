@@ -47,11 +47,20 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 
 	}
 
-	playlist.setActive = function(videoid){
-		//console.log(videoid);
+	playlist.setActive = function(data){
+		var videoid = data.videoid;
+		var pos = data.pos || -3;
 		playlist.list.find(".active").removeClass("active");
 		$("#"+videoid).addClass("active");
-		this.emit("setactive",{videoid:videoid});
+		this.emit("setactive",{
+			videoid:videoid,
+			pos:pos
+		});
+	}
+
+	// return active video id
+	playlist.getActive = function(){
+		return playlist.list.find(".active").attr("id"); //should this really do a dom lookup, or should it keep the answer in memory?
 	}
 
 	playlist.getall = function(data,callback){
@@ -59,6 +68,7 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 		var self = this;
 		var videos = data.videos;
 		var active = data.activeid;
+		var pos = data.pos;
 		playlist.list.children().remove(); // yeah, fuck you
 		
 		// Async Queue of all videos 
@@ -81,29 +91,49 @@ require(['#playlist .queue','#playlist .list','socket','eventEmitter'],function(
 
 		}
 		var done = function(){
-			playlist.setActive(active);
-			self.emit("load",{videoid:active});
+			var x = {
+				videoid:active,
+				pos:pos
+			};
+			playlist.setActive(x);
+			self.emit("load",x);
 		}
 		deque();
 
 	}
 
-	// return active video id
-	playlist.getActive = function(){
-		return playlist.list.find(".active").attr("id"); //should this really do a dom lookup, or should it keep the answer in memory?
-	}
 
 	playlist.jump = function(data){
-		console.log("jump not fully yet implemented",data);
 		var videoid = data.videoid;
-		playlist.setActive(videoid);
-		this.emit("jump",{videoid:videoid});
+		var pos = data.pos || -3;
+		playlist.setActive({
+			videoid:videoid,
+			pos:pos
+		});
+		this.emit("jump",{
+			videoid:videoid,
+			pos:pos
+		});
+	}
+
+	playlist.heartbeat = function(data){
+		activeid = data.activeid;
+		pos = data.pos;
+		if(playlist.getActive() !== activeid){
+			playlist.jump({
+				videoid:activeid,
+				pos:pos
+			})
+			return;
+		}
+		
 	}
 
 	/// Hook Socket events
-	bt.socket.on('pl:add', function (data) 		{ playlist.recv_add(data); } );
-	bt.socket.on('pl:getall', function (data) 	{ playlist.getall(data); } );
-	bt.socket.on('pl:jump', function (data) 	{ playlist.jump(data); } );
+	bt.socket.on('pl:add', function (data) 			{ playlist.recv_add(data); } );
+	bt.socket.on('pl:getall', function (data) 		{ playlist.getall(data); } );
+	bt.socket.on('pl:jump', function (data) 		{ playlist.jump(data); } );
+	bt.socket.on('vi:heartbeat', function (data) 	{ playlist.heartbeat(data); } );
 
 	/// Attach DOM events
 	$("#playlist .queue").keypress(function(e) {
