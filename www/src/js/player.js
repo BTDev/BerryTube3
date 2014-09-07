@@ -101,8 +101,9 @@
 		// timeout
 		pos = data.pos;
 		player.activeProvider.getTime(function(time){
-			var diff = Math.abs(pos-time);
-			if(diff > 2){ // TODO: Use localstorage / User Account Module
+			var diff = Math.abs(pos-time)/2;
+			if(diff > 1){ // TODO: Use localstorage / User Account Module
+				console.log("diff of",diff);
 				player.seek(pos);
 			}
 		});
@@ -115,7 +116,7 @@
 	}
 
 	/// Hook Socket events
-	bt.socket.on('vi:seek', function (data) 		{ player.seek(data,true);		} );
+	bt.socket.on('vi:seek', function (data) 		{ player.seek(data,true);	} );
 	bt.socket.on('vi:play', function (data) 		{ player.play(data);		} );
 	bt.socket.on('vi:stop', function (data) 		{ player.stop(data);		} );
 	bt.socket.on('vi:heartbeat', function (data) 	{ player.heartbeat(data);	} );

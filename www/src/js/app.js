@@ -12,7 +12,6 @@ $(function(){
 		socket.ping = function(callback){
 			var start = new Date().getTime();
 			socket.once("pong",function(){
-				console.log("got a pong");
 				var stop = new Date().getTime();
 				var delay = stop - start;
 
@@ -36,7 +35,6 @@ $(function(){
 				if(callback)callback(delay);
 			});
 			socket.emit("ping");
-			console.log("pinging");
 		}
 
 		bt.socket = socket; // 4 DA MODDERZ
@@ -44,9 +42,7 @@ $(function(){
 
 		// Start pings
 		setInterval(function(){
-			socket.ping(function(delay){
-				console.log("ping of",delay,"ms, avg",socket.avgping,"ms");
-			});
+			socket.ping();
 		},1000 * 60)
 
 	});

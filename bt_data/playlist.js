@@ -221,7 +221,6 @@ module.exports = function(bt,Video){
 	// Time functions
 	playlist.seek = function(to){
 		playlist.time.current = to;
-		console.log("Got seek to",to,"should emit update to time",playlist.time.current);
 		this.emit("seek",{
 			to:to
 		});
@@ -229,13 +228,11 @@ module.exports = function(bt,Video){
 
 	playlist.play = function(){
 		playlist.time.playing = true;
-		console.log("Got play, should emit play at time",playlist.time.current);
 		this.emit("play");
 	}
 
 	playlist.stop = function(){
 		playlist.time.playing = false;
-		console.log("Got stop, should emit pause at time",playlist.time.current);
 		this.emit("stop");
 	}
 
@@ -244,7 +241,6 @@ module.exports = function(bt,Video){
 		if(jumpto){
 			playlist.time.current = -1 * config.playlist.prevideo; // Not using seek to avoid duplicate events
 			playlist._active = jumpto;
-			console.log("Got jump, should emit jump to",playlist._active.video.data.tit);
 			this.emit("jump",{
 				to:playlist.time.current,
 				videoid:videoid

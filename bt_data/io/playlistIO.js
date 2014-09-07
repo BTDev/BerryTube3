@@ -45,7 +45,6 @@ module.exports = function(bt){
 			io.sockets.emit("pl:jump",data);
 		});
 
-
 		// Heartbeat
 		setInterval(function(){
 			io.sockets.emit("vi:heartbeat",{
@@ -76,6 +75,10 @@ module.exports = function(bt){
 				pos:playlist.getTime(),
 				videos:broadcastableArray
 			});
+		});
+
+		socket.on("pl:skip",function(){
+			playlist.playNext();
 		});
 
 	});
