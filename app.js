@@ -48,6 +48,11 @@ bt.playlist.on("load",function(){
 	*/
 });
 
+// Chat + IO
+bt.chat = require('./bt_data/chat.js')(bt);
+bt.chatIO = require('./bt_data/io/chatIO.js')(bt);
+bt.chat.init();
+
 // Misc IO
 bt.miscIO = require('./bt_data/io/miscIO.js')(bt);
 
