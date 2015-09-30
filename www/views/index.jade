@@ -1,16 +1,18 @@
 doctype html
 html
 	head#head
-		title BerryTube3 :: I couldn't stop it if i tried
-		link(href='css/jquery-ui.css', rel='stylesheet')
+		title BerryTube
+
 		link(href='css/main.css', rel='stylesheet')
-		// styles needed by tinyscrollbar
-		link(href='css/tinyscrollbar.css', rel='stylesheet')
+				
 		// Temp hardcoded Theme
 		link(href='css/themes/bp/main.css', rel='stylesheet')
-		script(src='js/bootloader.min.js' async='true')
+
+		script(src='js/vendor/q.js')
+		script(src='js/vendor/eventemitter2.js')
+		script(src='js/main.min.js' async='true')
 	body
-		div.root
-			include ./elements/video.jade
-			include ./elements/playlist.jade
-			include ./elements/chat.jade
+		div#root
+			div#social
+				include elements/userlist.jade
+				include elements/chat.jade

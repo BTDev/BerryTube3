@@ -18,7 +18,8 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-svgmin": "^0.4.0",
     "jade": "^1.5.0",
-    "nedb": "^0.11.0",
+    "mongodb": "^2.0.43",
+    "promise": "^7.0.4",
     "socket.io": "^1.0.6"
   }
 }

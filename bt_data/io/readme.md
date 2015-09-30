@@ -1,1 +1,0 @@
-IO Modules are designed to be the layer that deals with Actual network input/output, an interface to the more complex actions themselves. The playlist doesn't deal with customers, it has an IO module to handle that.

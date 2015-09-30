@@ -26,14 +26,11 @@ module.exports = function(grunt) {
 		concat: {
 			js: {
 				src: [
-					'www/src/js/vendor/jquery.js',
-					'www/src/js/vendor/jquery-ui.js',
-					'www/src/js/vendor/jquery.tinyscrollbar.js',
-					'www/src/js/*.js',
-					'www/src/js/players/*.js',
-					'!www/src/js/bootloader.js',
+					'www/src/js/main.js',
+					'www/src/js/**/*.js',
+					'!www/src/js/vendor/**/*.js',
 				],
-				dest: 'www/dist/js/deferred.js'
+				dest: 'www/dist/js/main.js'
 			},
 		},
 		uglify: {
@@ -43,8 +40,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					'www/dist/js/deferred.min.js': ['www/dist/js/deferred.js'],
-					'www/dist/js/bootloader.min.js': ['www/src/js/bootloader.js'],
+					'www/dist/js/main.min.js': ['www/dist/js/main.js'],
 				},
 				mangle: false,
 				banner: headerString
@@ -118,6 +114,7 @@ module.exports = function(grunt) {
 					'!**/*.js',
 					//'**/*.min.js',
 					'!**/elements/**',
+					'js/vendor/**/*.js',
 					
 				],
 				dest: distdir,

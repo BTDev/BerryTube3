@@ -1,98 +1,117 @@
 // GLOBALS
-main-site-wrapper-width = 960px;
-chat-pane-height = 330px
-chat-pane-width = 480px
+main-site-wrapper-width = 1200px;
+	
+body{
+	&[data-bt-logged-in=true] {
+		background-color: black;
+	}
+}
 
-// MIXINS
- 
-vendor(prop, args)
-	-webkit-{prop} args
-	-moz-{prop} args
-	-ms-{prop} args
-	-o-{prop} args
-	{prop} args
+#root {
+	width:main-site-wrapper-width;
+	margin:0 auto;
+}
 
-animation()
-	vendor('animation', arguments)
-
-user-select()
-	vendor('user-select', arguments)
-
-// STYLES
-
-.root
-	width main-site-wrapper-width
-	margin 0 auto
-
-img
-	border 1px solid
-
-#beam1
-	animation: blinky 7s infinite;
-
-#beam2
-	animation: blinky 11s infinite;
-
-#beam3
-	animation: blinky 13s infinite;
-
-@keyframes blinky 
-	0%
-		fill #000000
-	50%
-		fill #ffffff
-	100%
-		fill #000000
-
-// PLAYLIST
-
-#playlist 
-	height 200px
-	width 480px
-	float left
-
-#playlist .frame
-	overflow hidden
-	height 100%
+// Social Section
+#social { 
+	
+	// Define some vars
+	social-width = 700px;
+	social-height = 350px;
+	social-input-height = 30px;
+	social-userlist-width = 150px;
+	
+	width: social-width;
 	position relative
-
-#playlist .list .track
-	cursor pointer
-
-#playlist .list .track .title
-	user-select none
-	cursor inherit
-
-#playlist .list .track.active
-	background lime
-
-// VIDEO
-
-#video iframe
-	border 0
+	height social-height
 	
-// CHAT
+	// Chat "Module"
+	#chat {
 
-#chatpane
-	float right
-	height chat-pane-height
-	width chat-pane-width
+		font-size: 12pt;
+		width: social-width;
+		box-sizing: border-box;
 
-#chatbuffer
-	height chat-pane-height - 10
-	background white
+		#input {
+			#chatinput {
+				display: block;
+				width: social-width - social-userlist-width;
+				box-sizing: border-box;
+				border: 1px solid;
+				height: social-input-height;
+				padding: 3px;
+			}
+		}
+		
+		#chatbuffers {
+		
+			height: social-height - social-input-height;
+			width: social-width - social-userlist-width;
+		
+			.channel {
+			
+				background-color: #fff;
+				height:100%;
+				border: 1px solid;
+				box-sizing: border-box;
+				overflow-y: scroll;
+				overflow-x: wrap;
+				
+				.line {
+					
+					span {
+						padding: 0 3px;
+					}
+					
+					.timestamp {
+						font-size: 0.7em;
+						font-style: italic;
+						&:before { content: "<"; }
+						&:after { content: ">"; }
+					}
+					
+					.username {
+						font-weight:bold;
+						&:after { content: ":"; }
+					}
+					
+					&.error{
+						color: #D60000;
+						background-color: rgba(255, 0, 0, 0.08);
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
-#chatbuffer .message
-	padding 2px
-	text-indent 16px
-	font-family arial
-	font-size 13px
+	#userlist {
+		float right
+		width social-userlist-width
+		background white
+		height 100%
+		
+		.list {
+			border: 1px solid;
+			box-sizing: border-box;
+			height: 100%;
+			width: 100%;
+		}
+		
+	}
+
+	#login {
+		
+		
+		
+	}
 	
-#chatbuffer .message .from
-	font-weight bold
+	
+}
 
-#chatinput input
-	width 100%
-	border 0
-	padding 0
-	margin 0
+// Flag Styles
+body[data-bt-logged-in=true] #login{ display:none; }
+

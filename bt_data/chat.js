@@ -1,53 +1,54 @@
-var EventEmitter = require('events').EventEmitter;
-
+const Promise = require('promise');
+const events  = require('events');
 module.exports = function(bt){
+
+	var module_name = "chat";
+	var mod = { e:bt.register(module_name), events: new events.EventEmitter()  };
+
+	// CONVENTION: e.function refers to a common entrypoint, a method that may fail.
+	// the e function calls its main counterpart in the event of a "success"
 	
-	// This module contains actions for all chat-related actions. Chats, actions, administrative measures, and so on.
-	var config = bt.config;
-	var chat = new events.EventEmitter;
-	
-	chat.send = function(message){
-	
-		/**
-			Expects
-			message.from; "Cades"
-			message.words; "Give me Money"
-			Optional
-			message.secrets {} of PRIVATE metadata ( Never leaves app )
-			message.meta {} of PUBLIC metadata ( Expected to leave app )
-		*/
-		if(!message) return;
-		if(!message.from) return;
-		if(!message.words) return;
+	// Conditional
+	mod.e.message = function(data,socket){
+		// send secret message		
+		return new Promise(function(resolve,reject){
+			
+			if(!socket) throw new Error("No socket present on socket entrypoint");
+			if(!socket.profile) throw new Error("You must be logged in to chat.");
+			if(!data) throw new Error("No data received");
+			if(!data.message) throw new Error("No message received");
+			
+			return mod.broadcastMessage(socket.profile,data.message);
+			
+		});
+	} 
+
+	// Imperitive
+	mod.broadcastMessage = function(profile,message){
 		
-		// Act on any secrets
-		delete message.secrets;
+		var regex = /^\/(\w+)\s(.*)/; 
+		if(regex.test(message)) { 
+			var match = message.match(regex);
+			var command = match[1];
+			message = match[2];	
+			
+			if(command == "title"){
+				bt.util.setTitleOverride(message)
+				return;
+			}
+			
+		}
 		
-		this.emit("send",message);
-		
-	}
-	
-	chat.recv = function(socket,message){
-		// This function is used to parse out a message from a user.
-		// Attach name, timestamp, and check sentinel settings.
-		console.log(socket.request.connection.remoteAddress);
-		chat.send({
-			from:socket.request.connection.remoteAddress,
-			words:message.words
+		return bt.io.emit(module_name,{
+			ev:"message",
+			data:{
+				username:profile.username,
+				message:message,
+				timestamp: new Date()
+			}
 		});
 	}
 	
-	chat.init = function(){
-		this.emit("init");
-		var self = this;
-		setInterval(function(){
-			self.send({
-				from:"SERVER",
-				words:"Eat shit lol"
-			});
-		},10000);
-	}
-
-	return chat;
+	return mod;
 
 }

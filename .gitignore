@@ -217,3 +217,5 @@ pip-log.txt
 # Node
 node_modules/
 *.db
+ssl/berrytube.key
+ssl/berrytube.pem

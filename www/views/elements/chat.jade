@@ -1,4 +1,17 @@
-div#chatpane
-	div#chatbuffer
-	div#chatinput
-		input(type=text)
+div#chat
+	div#chatbuffers
+		div.channel(data-channel-id='root')
+	div#input
+		input#chatinput(type="text")
+		
+div#login
+	div.formrow
+		label Username
+		input#loginusername
+	div.formrow
+		label Password
+		input#loginpassword
+	div.formrow
+		button#loginbutton Login
+		button#registerbutton Register
+		
