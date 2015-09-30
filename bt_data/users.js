@@ -49,6 +49,12 @@ module.exports = function(bt){
 			// Check for birthday
 			if(!user.joinedon) { user.joinedon = new Date(); clean = false; }
 			
+			// Check for defined sort order
+			if(typeof user.ulsort == "undefined") { user.ulsort = 0; clean = false; }
+			
+			// Check for classes
+			if(typeof user.classes == "undefined") { user.classes = []; clean = false; }
+			
 			//all done. If unclean, save back to DB and return him.
 			if(!clean){
 				bt.dbUsers.done(function(users){
@@ -155,7 +161,9 @@ module.exports = function(bt){
 	mod.clean = function(data){
 		return {
 			_id: data._id || -1,
-			username: data.username || null
+			username: data.username || null,
+			classes: data.classes || [],
+			sortorder: data.sortorder || 0
 		};
 	}
 	

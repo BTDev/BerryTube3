@@ -258,6 +258,8 @@ var bt = (function (bt,module_name) {
 		var start = end = pos;
 		//whitespace is considered part of the previous word
 
+		if(!str[start]) return false;
+		
 		if(str[start].match(/\s/)) start = Math.max(start-1,0);
 		while(start > 0 && (str[start].match(/\w/))){
 			start--;
@@ -313,15 +315,16 @@ var bt = (function (bt,module_name) {
 		if(chat.tabCandidates.length == 0){
 			
 			chat.tabCursorInfo = getWordAtPos(this.value,this.selectionStart);
-			if(chat.tabCursorInfo.word == "") return;
-			
-			var response = ['Cades','Kris321',"Lavender","Toast","Blueshift","Bluddy","Kurtis"];
-			console.log(bt.userlist.getUsers());
+			if(!chat.tabCursorInfo || chat.tabCursorInfo.word == "") return;
+
+			// returns a list of user objects. 
+			var response = bt.userlist.getUsers();
 			
 			var candidates = []
 			for(var i=0;i<response.length;i++){
-				if(new RegExp("^"+chat.tabCursorInfo.word,"i").exec(response[i])){
-					candidates.push(response[i]);
+				if(new RegExp("^"+chat.tabCursorInfo.word,"i").exec(response[i].username)){
+					// TODO: if response[i].username is our username, we shouldnt add it. Self squees are dumb.
+					candidates.push(response[i].username);
 				}
 			}
 			

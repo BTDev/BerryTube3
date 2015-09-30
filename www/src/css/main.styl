@@ -2,9 +2,13 @@
 main-site-wrapper-width = 1200px;
 	
 body{
+
+	font-family: 'Muli', sans-serif;
+
 	&[data-bt-logged-in=true] {
 		background-color: black;
 	}
+	
 }
 
 #root {
@@ -99,6 +103,11 @@ body{
 			box-sizing: border-box;
 			height: 100%;
 			width: 100%;
+			
+			.user {
+				font-weight: bold;
+				padding: 3px;
+			}
 		}
 		
 	}

@@ -1,12 +1,8 @@
 doctype html
 html
 	head#head
-		title BerryTube
-
-		link(href='css/main.css', rel='stylesheet')
-				
-		// Temp hardcoded Theme
-		link(href='css/themes/bp/main.css', rel='stylesheet')
+		- var title = "BerryTube :: Dude, what?"
+		include elements/common.jade
 
 	body
 		div(id="#{something}")

@@ -53,9 +53,26 @@ var bt = (function (bt,module_name) {
 		console.log("adding",users);
 		userlist.getUserlistControls.done(function(controls){
 			for(var i in users){ (function(user){
+				
+				console.log(user);
+				
 				if(connectedUsers.indexOf(user) == -1)connectedUsers.push(user);
 				var x = document.createElement("div");
+				
+				// Assign object to the dom.
 				x.user = user;
+				
+				// Add Classes
+				x.classList.add("user");
+				for(var i=0;i<user.classes.length;i++) x.classList.add(user.classes[i]);
+
+				// Set Some attrs.
+				for(var attr in user){
+					// Skip 
+					if(attr == "classes") continue;
+					x.setAttribute("data-bt-"+attr,user[attr]);
+				}
+				
 				var list = controls.lists[0];
 				x.appendChild(document.createTextNode(user.username));
 				list.appendChild(x);

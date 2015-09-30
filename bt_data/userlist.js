@@ -15,14 +15,13 @@ module.exports = function(bt){
 		Lurkers: 0
 	}
 	
+	// This uses the users module for cleaning.
 	mod.packUsers = function(users){
 		var r = [];
 		for(var i in users){
 			var user = users[i];
 			if(!user.profile) continue;
-			r.push({
-				username:user.profile.username
-			});
+			r.push(bt.users.clean(user.profile));
 		}
 		return r;
 	};
