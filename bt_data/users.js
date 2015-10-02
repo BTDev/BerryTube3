@@ -55,6 +55,9 @@ module.exports = function(bt){
 			// Check for classes
 			if(typeof user.classes == "undefined") { user.classes = []; clean = false; }
 			
+			// Check for classes
+			if(typeof user.perms == "undefined") { user.perms = []; clean = false; }
+			
 			//all done. If unclean, save back to DB and return him.
 			if(!clean){
 				bt.dbUsers.done(function(users){
@@ -104,7 +107,9 @@ module.exports = function(bt){
 						} else {				
 							mod.getDressed(undressed).done(function(dressed){
 								socket.profile = dressed; // track the socket
-								resolve(mod.clean(socket.profile)); // tell the sucker
+								var cleaned = mod.clean(socket.profile); // Clean it, but...
+								cleaned.perms = socket.profile.perms; // we need our own perms at least.
+								resolve(cleaned); // tell the sucker
 								console.log(dressed);
 							});
 						}
