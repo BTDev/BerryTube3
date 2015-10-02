@@ -5,9 +5,13 @@ html
 		
 		script(src='js/vendor/q.js')
 		script(src='js/vendor/eventemitter2.js')
+		script(src='js/vendor/btscroller.js')
 		script(src='js/main.min.js' async='true')
 	body
 		div#root
+			div#playlist
+				include elements/playlist.jade
 			div#social
 				include elements/userlist.jade
 				include elements/chat.jade
+			div(style="clear:both")

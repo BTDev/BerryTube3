@@ -16,6 +16,131 @@ body{
 	margin:0 auto;
 }
 
+#playlist {
+
+	playlist-width = 500px;
+	playlist-height = 350px;
+
+	width playlist-width;
+	height playlist-height;
+	float left
+	background black
+	position relative 
+	color:white;
+	
+	.scrollwrapper {
+	
+		height:100%;
+	
+		#plitems {
+			margin-right:20px;
+			
+			// Playlist items here are broken out below mostly because of ghosting
+			
+		}
+		
+		.scrolltrack {
+			position: absolute;
+			top: 0;
+			width: 20px;
+			height: 100%;
+			background: #F00;
+			right: 0;
+			
+			.scrollscrubber {
+				width: 100%;
+				height: 50px;
+				background-color: #00F;
+			}
+			
+		}
+	}
+	
+}
+.playlistitem {
+
+	position: relative;
+	border: 1px solid;
+	margin: 2px;
+
+	.handle{
+	
+		// Only show on perms
+		body[data-bt-playlist-sort=true] & { width:5%; }
+		transition: 0.5s all;
+	
+		overflow: hidden;
+		position:absolute;
+		left:0;
+		top:0;
+		height:100%
+		width:0; 
+		background:gray
+		cursor: -webkit-grab;
+		cursor: -moz-grab;
+		
+		.fa.fa-bars {
+			width: 100%;
+			text-align: center;
+			pointer-events: none;
+		}
+		
+	}
+	
+	.content{
+	
+		// Only show on perms
+		body[data-bt-playlist-sort=true] & { margin-left:5%; }
+		transition: 0.5s all;
+	
+		margin-left:0;
+	}
+	
+	&.target { 
+		background:green;
+		
+		&.below:after {
+			display: block;
+			content: "\f060";
+			font-family: "FontAwesome";
+			height: 60px;
+			position: absolute;
+			bottom: -30px;
+			left: 30px;
+			line-height: 60px;
+			width: 30px;
+			box-sizing: border-box;
+			z-index: 1;
+			font-size: 30px;
+		}
+		
+		&.above:before {
+			display: block;
+			content: "\f060";
+			font-family: "FontAwesome";
+			height: 60px;
+			position: absolute;
+			top: -30px;
+			left: 30px;
+			line-height: 60px;
+			width: 30px;
+			box-sizing: border-box;
+			z-index: 1;
+			font-size: 30px;
+		}
+		
+	}
+	
+	&.ghost{
+		padding: 3px;
+		width: 400px;
+		background-color: black;
+		color: white;
+		opacity: 0.5;
+	}
+}
+
+
 // Social Section
 #social { 
 	
@@ -28,6 +153,7 @@ body{
 	width: social-width;
 	position relative
 	height social-height
+	float:right;
 	
 	// Chat "Module"
 	#chat {
@@ -122,13 +248,9 @@ body{
 	}
 
 	#login {
-		
-		
-		
+		// Only show on perms
+		body[data-bt-logged-in=true] & { display:none; }
 	}
 	
 	
 }
-
-// Flag Styles
-body[data-bt-logged-in=true] #login{ display:none; }

@@ -18,9 +18,10 @@ var bt = (function (bt,module_name) {
 			// like visibility, functions, special bt-gold powers, and so on.
 			user.profile = data || {};
 			bt.setFlag(FLAG_LOGGED_IN,true);
-			if(user.profile.flags){
-				for(var flagname in user.profile.flags){
-					bt.setFlag(flagname,user.profile.flags[flagname]);
+			console.log(user.profile);
+			if(user.profile.perms){
+				for(var i=0;i<user.profile.perms.length;i++){
+					bt.setFlag(user.profile.perms[i],true);
 				}
 			}
 		},function(e){
