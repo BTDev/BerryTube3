@@ -219,3 +219,7 @@ node_modules/
 *.db
 ssl/berrytube.key
 ssl/berrytube.pem
+zz-RUN.bat
+zz-run-grunt.bat
+zz-run-mongo.lnk
+zz-run-nodemon.bat

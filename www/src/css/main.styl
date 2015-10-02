@@ -3,7 +3,7 @@ main-site-wrapper-width = 1200px;
 	
 body{
 
-	font-family: 'Muli', sans-serif;
+	font-family: 'Droid Sans', sans-serif;
 
 	&[data-bt-logged-in=true] {
 		background-color: black;
@@ -61,7 +61,9 @@ body{
 				overflow-y: scroll;
 				overflow-x: wrap;
 				
-				.line {
+				.chatline {
+					
+					margin: 5px 0 0;
 					
 					span {
 						padding: 0 3px;
@@ -83,6 +85,13 @@ body{
 						color: #D60000;
 						background-color: rgba(255, 0, 0, 0.08);
 					}
+					
+					&.addendum{
+						margin: 0 0 0 20px;
+						.timestamp { display:none }
+						.username { display:none } 
+					}
+					
 					
 				}
 				
@@ -123,4 +132,3 @@ body{
 
 // Flag Styles
 body[data-bt-logged-in=true] #login{ display:none; }
-

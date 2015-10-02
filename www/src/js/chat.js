@@ -75,9 +75,26 @@ var bt = (function (bt,module_name) {
 	chat.e.message = function(data){
 		chat.recvMessage(data);
 	}
+	// attach some events
+	chat.e.scrollback = function(data){
+		for(var i=0;i<data.length;i++) chat.recvMessage(data[i]);
+	}
+	
+	// attach some events
+	chat.e.curate = function(data){
+		console.log(data);
+		chat.bufferMap = chat.bufferMap || {};
+		for(var i=0;i<data.rm.length;i++){
+			if(chat.bufferMap[data.rm[i]]) {
+				var dmw = chat.bufferMap[data.rm[i]];
+				dmw.previousSibling.classList.remove("addendum");
+				dmw.parentNode.removeChild(dmw); 
+			}
+		}
+	} 
 	
 	chat.recvMessage = function(data){
-		
+		 
 		chat.getChatControls.done(function(controls){
 		
 			// Grab correct buffer
@@ -161,10 +178,15 @@ var bt = (function (bt,module_name) {
 		
 		// set classes
 		msg.className = "";
-		msg.classList.add("line");
+		msg.classList.add("chatline");
 		if(data.classes) data.classes.forEach(function(cl){
 			msg.classList.add(cl);
 		});
+		if(data.id) msg.setAttribute("chatid",data.id);
+		
+		// assign to buffer
+		chat.bufferMap = chat.bufferMap || {};
+		chat.bufferMap[data.id] = msg; 
 		 
 		// set values
 		msg.domvals = msg.domvals || {};
@@ -183,8 +205,16 @@ var bt = (function (bt,module_name) {
 		msg.domlist.username.innerHTML = chat.fieldRender("username",msg.domvals.username);
 		msg.domlist.message.innerHTML = chat.fieldRender("message",msg.domvals.message);
 		
+		// Handle addendums
+		if(chat.lastSpeaker && chat.lastSpeaker == msg.domvals.username){
+			msg.classList.add("addendum");
+		}
+		chat.lastSpeaker = msg.domvals.username;
+		
 		// Add to the bottom of the chat.
 		channel.appendChild(msg);
+		
+		chat.lastSpeaker = msg.domvals.username;
 		
 		// if we previously determined we should scroll, then do it.
 		if(scroll) channel.scrollTop = channel.scrollHeight;
