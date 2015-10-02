@@ -55,9 +55,6 @@ module.exports = function(bt){
 			// Check for classes
 			if(typeof user.classes == "undefined") { user.classes = []; clean = false; }
 			
-			// Check for classes
-			if(typeof user.perms == "undefined") { user.perms = []; clean = false; }
-			
 			//all done. If unclean, save back to DB and return him.
 			if(!clean){
 				bt.dbUsers.done(function(users){
@@ -107,9 +104,7 @@ module.exports = function(bt){
 						} else {				
 							mod.getDressed(undressed).done(function(dressed){
 								socket.profile = dressed; // track the socket
-								var cleaned = mod.clean(socket.profile); // Clean it, but...
-								cleaned.perms = socket.profile.perms; // we need our own perms at least.
-								resolve(cleaned); // tell the sucker
+								resolve(mod.clean(socket.profile)); // tell the sucker
 								console.log(dressed);
 							});
 						}
@@ -153,9 +148,10 @@ module.exports = function(bt){
 				newbie.username = data.username || "Shithead";
 				newbie.password = hashedpw || "password";
 				 
-				var salt = mod.hashPassword(Math.random() * 100000000);
+				var salt = mod.hashPassword((Math.random() * 100000000)+"");
 				var saltedPass = data.password + salt;
 				newbie.password = mod.hashPassword(saltedPass);
+				newbie.salt = salt;
 				
 				newbie.joinedon = new Date();
 				
