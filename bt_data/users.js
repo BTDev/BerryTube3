@@ -144,8 +144,14 @@ module.exports = function(bt){
 				var hashedpw = mod.hashPassword(data.password);
 				
 				var newbie = {};
+				
 				newbie.username = data.username || "Shithead";
 				newbie.password = hashedpw || "password";
+				 
+				var salt = mod.hashPassword(Math.random() * 100000000);
+				var saltedPass = data.password + salt;
+				newbie.password = mod.hashPassword(saltedPass);
+				
 				newbie.joinedon = new Date();
 				
 				users.insertOne(newbie, function(err, result) {
