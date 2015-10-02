@@ -133,7 +133,7 @@ bt.triggerEvent = (function(){
 	return function(ns,ev,reply,socket){
 		bt.emit(ns,{ ev:ev.ev, data:ev.data, reply:reply, socket:socket });
 	};
-})();
+})(); 
 
 // Load modules
 bt.users = require('./bt_data/users.js')(bt);
