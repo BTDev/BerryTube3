@@ -140,7 +140,7 @@ bt.users = require('./bt_data/users.js')(bt);
 bt.chat = require('./bt_data/chat.js')(bt);
 bt.util = require('./bt_data/util.js')(bt);
 bt.userlist = require('./bt_data/userlist.js')(bt);
-bt.playlist = require('./bt_data/playlist.js')(bt);
+bt.playlist = require('./bt_data/playlist.js')(bt); 
 
 // Configure Web Provider
 bt.web.engine('jade', require('jade').__express);

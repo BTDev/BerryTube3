@@ -14,7 +14,9 @@ var bt = (function (bt,module_name) {
 		return Array.prototype.indexOf.call(element.parentNode.children, element);
 	}
 	
-	
+	playlist.e.fulllist = function(data){
+		console.log(data);
+	}
 	
 	playlist.addItem = function(item){
 		
