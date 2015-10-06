@@ -1,3 +1,6 @@
+const ObjectId = require('mongodb').ObjectID;
+const Promise = require('promise');
+
 module.exports = function(bt){
 
 	var module_name = "playlist";
@@ -8,16 +11,81 @@ module.exports = function(bt){
 	
 	var lnFirst = false;
 	var lnLast = false;
+	var lnIndex = 0; 
+	var lnMap = {};
 	
-	var LinkedNode = function(data){
+	var loadPlaylist = function(name){
+		// RIP.
+		lnFirst = false;
+		lnLast = false;
+		return new Promise(function(resolve,reject){
+			bt.dbPlaylist.done(function(playlist){
+				var previous = false;
+				playlist.findOne({name:name},function(err,playlist){
+					if(!playlist){
+						reject(new Error("Empty Playlist"));
+						return;
+					} 
+					
+					var videos = playlist.videos;
+					for(var i=0;i<videos.length;i++){
+						if(!lnLast) new LinkedNode({data:videos[i]});
+						else lnLast.append(new LinkedNode({data:videos[i]}));
+					} 
+					resolve();
+				});
+			});
+		});
+	}; 
+	
+	var savePlaylist = function(name){
+		return new Promise(function(resolve,reject){ 
+			var videos = [];
+			var elem = lnFirst;
+			do {
+				videos.push(elem.data);
+				elem = elem.next;
+			} while (elem != lnFirst);
+						
+			// find pre-exisiting
+			bt.dbPlaylist.then(function(playlist){
+				return new Promise(function(res,rej){ 
+					playlist.findOne({name:name},function(err,pl){
+						if(pl) res(playlist,ObjectId(pl._id));
+						else {
+							playlist.insertOne({name:name},function(err,inserted){
+								res(playlist,ObjectId(inserted.insertedId));
+							}); 
+						}
+					});
+				})
+			}).then(function(playlist,_id){
+				playlist.update({name:name},{$set:{videos:videos}},function(err,results){
+					resolve(results);
+				});
+			},function(e){
+				console.error(e);
+			});
+			
+		});
+	}
+	
+	var LinkedNode = function(init){
 	
 		var self = this;
-		self.data = data || {};
-		self.next = self;
-		self.prev = self;
+		init = init || {};
+		self.data = init.data || {};
+		self.next = init.next || self;
+		self.prev = init.prev || self;
 		if(!lnFirst) lnFirst = self;
 		if(!lnLast) lnLast = self;
 		
+		// Assign self ID.
+		// So i did the math here, JS's max int size is about 9007199254740991, safely speaking.
+		// at 1 node created per second, it would take 2.845x10^8 years ( roughly 1/16th the age of earth)
+		// to reach that number. And thats assuming one unbroken process, since these ID's are lost on reboot anyway 
+		self.id = (lnIndex++).toString(36);
+				
 		self.append = function(otherLN){
 			
 			if(!otherLN) return;
@@ -38,6 +106,9 @@ module.exports = function(bt){
 			
 			// transfer titles if necessary
 			if(lnLast == self) lnLast = otherLN;
+			
+			// return self for chaining.
+			return self;
 			
 		}
 		
@@ -62,69 +133,77 @@ module.exports = function(bt){
 			// transfer titles if necessary
 			if(lnFirst == self) lnFirst = otherLN;
 			
+			// return self for chaining.
+			return self;
 		}
 		
 		return self;
 		
 	}
 	
-	/*
-	var x = new LinkedNode("x");
-	var a = new LinkedNode("a");
-	var y = new LinkedNode("y");
-	var z = new LinkedNode("z");
-	
-	x.append(y);
-	y.prepend(z); 
-	z.append(x); 
-	y.append(z);
-	y.append(a);
-	
-	// loop
-	var elem = lnFirst;
-	console.log("First",lnFirst.data);
-	do {
-		console.log(elem.data);
-		elem = elem.next;
-	} while (elem != lnFirst);
-	console.log("Last",lnLast.data);
-	//mod.newVideo = 
-	*/
+	// abstract because jerick wont get off my back about dictionaries. this will let us restructure it later.
+	mod.getVideoOfId = function(id){
+		return new Promise(function(resolve,reject){
+			var elem = lnFirst;
+			if(elem) {
+				do {
+					if(elem.id == id) break;
+					elem = elem.next;
+				} while (elem != lnFirst);
+				resolve(elem);
+			} else {
+				reject();
+			}
+		});
+	}
+	 
+	mod.e.move = function(data,socket){
+		return bt.security.soft(socket,"playlist-sort").then(function(){
 		
-	var list = [];
-	list.push({
-		title:"Invader Zim Computer Processing",
-		length: 100,
-		key: "DO82msI1QbY",
-		source: "youtube"
-	});
-	list.push({
-		title:"DVNO [PMV]",
-		length: 100,
-		key: "YAfl0oRqcK0",
-		source: "youtube"
-	});
-	list.push({
-		title:"A Final Twilight [AND ANNOUNCEMENT]",
-		length: 100,
-		key: "mG4Ug7EWUbA",
-		source: "youtube"
-	});
-	list.push({
-		title:"Alive (PMV)",
-		length: 100,
-		key: "lN1lwvVn-zE",
-		source: "youtube"
-	});
-	
-	mod.getFullList = function(){
-		return list;
+			if(!data) throw new Error("pls");
+			if(!data.from) throw new Error("Missing 'from'");
+			if(!data.to) throw new Error("Missing 'to'");
+			if(!data.side) throw new Error("Missing 'side'");
+		
+			Promise.all([
+				mod.getVideoOfId(data.from),
+				mod.getVideoOfId(data.to)
+			]).then(function(vals){
+				var from = vals[0];
+				var to = vals[1];
+				if(data.side == 1) to.append(from);
+				if(data.side == -1) to.prepend(from);
+			});
+			return "OK";
+			
+		});
 	}
 	
+	loadPlaylist("main").then(function(){},function(e){
+		new LinkedNode(); 
+		savePlaylist("main");
+	});
+	
+	mod.flatList = function(){ 
+		return new Promise(function(resolve){
+			var list = [];
+			var elem = lnFirst;
+			if(elem) {
+				do {
+					list.push({data:elem.data,id:elem.id});
+					elem = elem.next;
+				} while (elem != lnFirst);
+			}
+			resolve(list);
+		});
+	}
+		
 	bt.io.on("connection",function(socket){
-		socket.emit(module_name,{
-			ev:"fulllist",
-			data: mod.getFullList()
+		mod.flatList().done(function(list){
+			socket.emit(module_name,{
+				ev:"fulllist",
+				data: list
+			});
 		});
 	});
 	

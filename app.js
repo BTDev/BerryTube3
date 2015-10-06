@@ -56,6 +56,12 @@ bt.dbUsers = new Promise(function(resolve,reject){
 	});
 });
 
+bt.dbPlaylist = new Promise(function(resolve,reject){
+	bt.dbConnection.done(function(db){
+		resolve(db.collection('playlist'));	
+	});
+});
+
 // Define event registrar & emitter
 bt.register = (function(){
 
@@ -136,6 +142,7 @@ bt.triggerEvent = (function(){
 })(); 
 
 // Load modules
+bt.security = require('./bt_data/security.js')(bt); 
 bt.users = require('./bt_data/users.js')(bt);
 bt.chat = require('./bt_data/chat.js')(bt);
 bt.util = require('./bt_data/util.js')(bt);
