@@ -94,7 +94,7 @@ module.exports = function(bt){
 			if(otherLN.prev) otherLN.prev.next = otherLN.next;
 			if(otherLN.next) otherLN.next.prev = otherLN.prev;
 			if(lnFirst == otherLN) lnFirst = otherLN.next; // if we just moved the first one after me, the one after him is now first.
-			if(lnLast == otherLN) lnFirst = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
+			if(lnLast == otherLN) lnLast = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
 			
 			// Line up others next and prev to mine
 			otherLN.next = self.next;
@@ -106,6 +106,20 @@ module.exports = function(bt){
 			
 			// transfer titles if necessary
 			if(lnLast == self) lnLast = otherLN;
+			
+			// Broadcast
+			bt.io.emit(module_name,{
+				ev:"move",
+				data: {
+					from:mod.simplePlItem(otherLN),
+					after:mod.simplePlItem(self)
+				}
+			});
+			
+			//debugging
+			//mod.flatList().done(function(list){
+			//	for(var i=0;i<list.length;i++) console.log(list[i].data.title);
+			//});
 			
 			// return self for chaining.
 			return self;
@@ -120,7 +134,7 @@ module.exports = function(bt){
 			if(otherLN.prev) otherLN.prev.next = otherLN.next;
 			if(otherLN.next) otherLN.next.prev = otherLN.prev;
 			if(lnFirst == otherLN) lnFirst = otherLN.next; // if we just moved the first one after me, the one after him is now first.
-			if(lnLast == otherLN) lnFirst = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
+			if(lnLast == otherLN) lnLast = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
 
 			// Line up others next and prev to mine
 			otherLN.next = self;
@@ -132,6 +146,20 @@ module.exports = function(bt){
 			
 			// transfer titles if necessary
 			if(lnFirst == self) lnFirst = otherLN;
+			
+			// Broadcast
+			bt.io.emit(module_name,{
+				ev:"move",
+				data: {
+					from:mod.simplePlItem(otherLN),
+					before:mod.simplePlItem(self)
+				}
+			});
+			
+			//debugging
+			//mod.flatList().done(function(list){
+			//	for(var i=0;i<list.length;i++) console.log(list[i].data.title);
+			//});
 			
 			// return self for chaining.
 			return self;
@@ -184,13 +212,17 @@ module.exports = function(bt){
 		savePlaylist("main");
 	});
 	
+	mod.simplePlItem = function(elem){
+		return {data:elem.data,id:elem.id}
+	}
+	
 	mod.flatList = function(){ 
 		return new Promise(function(resolve){
 			var list = [];
 			var elem = lnFirst;
 			if(elem) {
 				do {
-					list.push({data:elem.data,id:elem.id});
+					list.push(mod.simplePlItem(elem));
 					elem = elem.next;
 				} while (elem != lnFirst);
 			}

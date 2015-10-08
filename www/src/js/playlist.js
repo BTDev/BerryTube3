@@ -8,6 +8,11 @@ var bt = (function (bt,module_name) {
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
 	playlist.list = document.getElementById(DOMID_PLITEMS);
+	playlist.map = {};
+	
+	// Anything that modifies the dom should use the event queue. This will severely lessen dom explosions
+	playlist.evqueue = new EventQueue();
+	
 	BTScroller.init(playlist.list);
 	
 	var nodeIndex = function(element){
@@ -16,10 +21,13 @@ var bt = (function (bt,module_name) {
 	
 	playlist.e.fulllist = function(data){
 		console.log(data);
-		playlist.clear();
-		for(var i=0;i<data.length;i++){
-			playlist.addItem(data[i]);
-		}
+		playlist.evqueue.run(function(done){
+			playlist.clear();
+			for(var i=0;i<data.length;i++){
+				playlist.addItem(data[i]);
+			}
+			done();
+		});
 	}
 	
 	playlist.clear = function(){
@@ -48,6 +56,7 @@ var bt = (function (bt,module_name) {
 		
 		// attach item
 		elem.item = item;
+		playlist.map[elem.item.id] = elem;
 		
 		// create drag handle
 		elem.handle =  document.createElement("div");
@@ -158,6 +167,38 @@ var bt = (function (bt,module_name) {
 			side:side
 		};
 		bt.rawEmit(module_name,"move",pak);
+	}
+	
+	playlist.e.move = function(data){
+	
+		playlist.evqueue.run(function(done){
+
+			console.log(playlist.map[data.from.id]);
+			var from = false;
+			if(playlist.map[data.from.id]){
+				// move item on playlist
+				from = playlist.map[data.from.id];
+			} else {
+				// new item to be made 
+				from = playlist.addItem(data.from);
+			}
+			
+			if(data.after){
+				var aft = playlist.map[data.after.id];
+				if(!aft) return;
+				playlist.list.insertBefore(from,aft.nextSibling);
+			}
+			if(data.before){
+				var aft = playlist.map[data.before.id];
+				if(!aft) return;
+				playlist.list.insertBefore(from,aft);
+			}
+			console.log();
+			console.log(data);
+			
+			done();			
+			
+		});
 	}
 	
 	
