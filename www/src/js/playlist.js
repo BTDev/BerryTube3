@@ -8,13 +8,31 @@ var bt = (function (bt,module_name) {
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
 	playlist.list = document.getElementById(DOMID_PLITEMS);
+	playlist.map = {};
+	
+	// Anything that modifies the dom should use the event queue. This will severely lessen dom explosions
+	playlist.evqueue = new EventQueue();
+	
 	BTScroller.init(playlist.list);
 	
 	var nodeIndex = function(element){
 		return Array.prototype.indexOf.call(element.parentNode.children, element);
 	}
 	
+	playlist.e.fulllist = function(data){
+		console.log(data);
+		playlist.evqueue.run(function(done){
+			playlist.clear();
+			for(var i=0;i<data.length;i++){
+				playlist.addItem(data[i]);
+			}
+			done();
+		});
+	}
 	
+	playlist.clear = function(){
+		playlist.list.innerHTML = ""; //clean, effective, brutal. Berrytube.
+	}
 	
 	playlist.addItem = function(item){
 		
@@ -38,6 +56,7 @@ var bt = (function (bt,module_name) {
 		
 		// attach item
 		elem.item = item;
+		playlist.map[elem.item.id] = elem;
 		
 		// create drag handle
 		elem.handle =  document.createElement("div");
@@ -47,7 +66,7 @@ var bt = (function (bt,module_name) {
 		elem.content = document.createElement("div");
 		elem.content.classList.add("content");
 		
-		elem.content.innerHTML = JSON.stringify(item);
+		elem.content.innerHTML = item.data.title;
 		
 		elem.appendChild(elem.content);
 		
@@ -143,27 +162,45 @@ var bt = (function (bt,module_name) {
 		if(side < 0) side = -1;
 		if(side > 0) side = 1;
 		var pak = {
-			from:from.item,
-			to:to.item,
+			from:from.item.id,
+			to:to.item.id,
 			side:side
 		};
-		console.log(pak);
-		//word = "above"; if(side == 1) word = "below";
-		//console.log("move",id,word,position);
+		bt.rawEmit(module_name,"move",pak);
 	}
 	
-	var test = function(){
-		var datasize = 100;
-
-		for(var i=0;i<datasize;i++){
-			var text = "";
-			text = i
-			if(i % 20 == 0)	text = i + "#playlist { height:300px; width:400px; overflow:hidden; }#playlist { height:300px; width:400px; overflow:hidden; }#playlist { height:300px; width:400px; overflow:hidden; }";
-			playlist.addItem(text);
-		}
+	playlist.e.move = function(data){
 	
-	};
-	test();
+		playlist.evqueue.run(function(done){
+
+			console.log(playlist.map[data.from.id]);
+			var from = false;
+			if(playlist.map[data.from.id]){
+				// move item on playlist
+				from = playlist.map[data.from.id];
+			} else {
+				// new item to be made 
+				from = playlist.addItem(data.from);
+			}
+			
+			if(data.after){
+				var aft = playlist.map[data.after.id];
+				if(!aft) return;
+				playlist.list.insertBefore(from,aft.nextSibling);
+			}
+			if(data.before){
+				var aft = playlist.map[data.before.id];
+				if(!aft) return;
+				playlist.list.insertBefore(from,aft);
+			}
+			console.log();
+			console.log(data);
+			
+			done();			
+			
+		});
+	}
+	
 	
 	return bt;
 }(bt,"playlist"));

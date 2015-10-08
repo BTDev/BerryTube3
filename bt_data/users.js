@@ -86,7 +86,6 @@ module.exports = function(bt){
 			// Check if valid user
 			bt.dbUsers.done(function(users){
 				var s = {username:data.username};
-				console.log(s);
 				users.findOne(s,function(err,undressed){
 					if(err) throw err;				
 					if(undressed){

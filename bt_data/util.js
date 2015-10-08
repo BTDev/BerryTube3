@@ -33,7 +33,7 @@ module.exports = function(bt){
 	};
 		
 	mod.sendNewTitle = function(socket){
-		socket.emit("util",{
+		socket.emit(module_name,{
 			ev:"pagetitle",
 			data: mod.getCurrentTitle()
 		});
