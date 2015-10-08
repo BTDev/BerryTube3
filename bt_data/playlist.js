@@ -58,7 +58,7 @@ module.exports = function(bt){
 							}); 
 						}
 					});
-				})
+				});
 			}).then(function(playlist,_id){
 				playlist.update({name:name},{$set:{videos:videos}},function(err,results){
 					resolve(results);
@@ -68,7 +68,7 @@ module.exports = function(bt){
 			});
 			
 		});
-	}
+	};
 	
 	var LinkedNode = function(init){
 	
@@ -124,7 +124,7 @@ module.exports = function(bt){
 			// return self for chaining.
 			return self;
 			
-		}
+		};
 		
 		self.prepend = function(otherLN){
 		
@@ -163,11 +163,11 @@ module.exports = function(bt){
 			
 			// return self for chaining.
 			return self;
-		}
+		};
 		
 		return self;
 		
-	}
+	};
 	
 	// abstract because jerick wont get off my back about dictionaries. this will let us restructure it later.
 	mod.getVideoOfId = function(id){
@@ -183,7 +183,7 @@ module.exports = function(bt){
 				reject();
 			}
 		});
-	}
+	};
 	 
 	mod.e.move = function(data,socket){
 		return bt.security.soft(socket,"playlist-sort").then(function(){
@@ -205,7 +205,7 @@ module.exports = function(bt){
 			return "OK";
 			
 		});
-	}
+	};
 	
 	loadPlaylist("main").then(function(){},function(e){
 		new LinkedNode(); 
@@ -213,8 +213,8 @@ module.exports = function(bt){
 	});
 	
 	mod.simplePlItem = function(elem){
-		return {data:elem.data,id:elem.id}
-	}
+		return {data:elem.data,id:elem.id};
+	};
 	
 	mod.flatList = function(){ 
 		return new Promise(function(resolve){
@@ -228,6 +228,15 @@ module.exports = function(bt){
 			}
 			resolve(list);
 		});
+	};
+	
+	// we need to start a sort of subtask
+	mod.timeSinceStart = -2; // TODO make this configurable
+	mod.lastCheckAt
+	mod.timer = setInterval(function(){mod.clockTick();},1000);
+	mod.clockTick = function(){
+		
+		
 	}
 		
 	bt.io.on("connection",function(socket){
@@ -241,4 +250,4 @@ module.exports = function(bt){
 	
 	return mod;
 
-}
+};

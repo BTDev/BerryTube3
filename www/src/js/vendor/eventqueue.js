@@ -18,7 +18,7 @@ var EventQueue = function(){
 
         running = true;
 
-        var res = new Promise(action);
+        var res = new Q.Promise(action);
         res.then(function(){
           popAndPerform();
         })

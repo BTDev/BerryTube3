@@ -186,17 +186,32 @@ var bt = (function (bt,module_name) {
 			if(data.after){
 				var aft = playlist.map[data.after.id];
 				if(!aft) return;
-				playlist.list.insertBefore(from,aft.nextSibling);
+				
+				// save height
+				var temp = from.clientHeight;
+				tween(from,"height","0px",temp+"px",250).then(function(){
+					playlist.list.insertBefore(from,aft.nextSibling);
+				}).then(function(){
+					return tween(from,"height",temp+"px","0px",250);
+				}).then(function(){
+					done();		
+				})
+				
+				
 			}
 			if(data.before){
 				var aft = playlist.map[data.before.id];
 				if(!aft) return;
-				playlist.list.insertBefore(from,aft);
-			}
-			console.log();
-			console.log(data);
-			
-			done();			
+				
+				var temp = from.clientHeight;
+				tween(from,"height","0px",temp+"px",250).then(function(){
+					playlist.list.insertBefore(from,aft);
+				}).then(function(){
+					return tween(from,"height",temp+"px","0px",250);
+				}).then(function(){
+					done();		
+				})
+			}		
 			
 		});
 	}
