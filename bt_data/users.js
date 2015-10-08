@@ -110,7 +110,6 @@ module.exports = function(bt){
 								var cleaned = mod.clean(socket.profile); // Clean it, but...
 								cleaned.perms = socket.profile.perms; // we need our own perms at least.
 								resolve(cleaned); // tell the sucker
-								console.log(dressed);
 							});
 						}
 					} else {
