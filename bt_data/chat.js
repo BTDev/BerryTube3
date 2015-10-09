@@ -5,7 +5,7 @@ module.exports = function(bt){
 	var module_name = "chat";
 	var mod = { e:bt.register(module_name), events: new events.EventEmitter()  };
 	
-	mod.scrollback_size = 6;
+	mod.scrollback_size = 100;
 
 	// CONVENTION: e.function refers to a common entrypoint, a method that may fail.
 	// the e function calls its main counterpart in the event of a "success"
