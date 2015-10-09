@@ -6,6 +6,8 @@ const util = require('util');
 const fs = require('fs');
 
 var bt = new events.EventEmitter(); // Let there be light.
+bt.setMaxListeners( 200 );
+
 bt.config = require('./bt_data/config.js');
 
 // Setup Net Services
@@ -20,11 +22,12 @@ bt.server = require("https").Server({
 // Use HTTP
 //bt.server = require('http').Server(bt.web);
 bt.io = require('socket.io')(bt.server);
+bt.io.sockets.setMaxListeners( 200 );
 
 // Logger 
 bt.log = function(){
 	console.log.apply(console,arguments);
-}
+};
 
 // Setup Database
 var MongoClient = require('mongodb').MongoClient;
@@ -70,7 +73,7 @@ bt.register = (function(){
 	// only accessible to the returned function. Cleanliness!
 	var ifEventValid = function(ev,cb){
 		if(ev && ev.ev && ev.data) if(cb)cb();
-	}
+	};
 	
 	return function(evname){
 		var obj = {};
@@ -79,7 +82,9 @@ bt.register = (function(){
 		// external -> internal event proxy, or else everything will fire multiple times depending on how
 		// many listeners there are.
 		
+    
 		bt.log("Assigning Connection CB for",evname);
+    
 		bt.io.on("connection",function(socket){
 			socket.on(evname,function(ev,reply){
 				ifEventValid(ev,function(){
@@ -88,6 +93,9 @@ bt.register = (function(){
 			});
 		});
 		
+    // increment since these shouldnt count.
+    //bt.setMaxListeners(bt.getMaxListeners()+1);
+    
 		bt.on(evname,function(ev){
 			ifEventValid(ev,function(){			
 				if(obj && obj[ev.ev]) { 
@@ -132,7 +140,7 @@ bt.register = (function(){
 			});
 		});
 		return obj;
-	}
+	};
 })();
 
 bt.triggerEvent = (function(){
@@ -152,8 +160,8 @@ bt.playlist = require('./bt_data/playlist.js')(bt);
 
 // Configure Web Provider
 bt.web.engine('jade', require('jade').__express);
-bt.web.set('views', __dirname + '/www/views')
-bt.web.set('view engine', 'jade')
+bt.web.set('views', __dirname + '/www/views');
+bt.web.set('view engine', 'jade');
 bt.web.use(bt.express.static(__dirname + '/www/dist'));
 
 // ATTACH ROUTES HERE
@@ -163,4 +171,3 @@ bt.web.get('/about',function(req, res){res.render('about',{something:"else"});})
 
 // Start Server
 bt.server.listen(3000);
-

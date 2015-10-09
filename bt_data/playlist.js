@@ -239,7 +239,7 @@ module.exports = function(bt){
 				at: mod.timeSinceStart
 			}
 		});
-	}
+	};
 	
 	mod.setActive = function(video){
 		lnActive = video;
@@ -247,14 +247,14 @@ module.exports = function(bt){
 		savePlaylist("main"); // Maybe? 
 		console.log("swapping to",video);
 		mod.sendActive(bt.io);
-	}
+	};
 	
 	mod.e.getactive = function(){
 		return {
 			video:mod.simplePlItem(lnActive),
 			at: mod.timeSinceStart
-		}
-	} 
+		};
+	};
 	
 	mod.e.queue = function(data,socket){
 		return bt.security.soft(socket,"playlist-queue").then(function(){
@@ -262,7 +262,7 @@ module.exports = function(bt){
 				lnLast.append(new LinkedNode({data:video}));
 			});
 		});
-	}
+	};
 	
 	
 	// we need to start a sort of subtask
@@ -288,9 +288,8 @@ module.exports = function(bt){
 		} else {
 			return;
 		}
-		console.log(mod.timeSinceStart);
 		
-	}
+	};
 		
 	bt.io.on("connection",function(socket){
 		mod.flatList().done(function(list){
