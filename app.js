@@ -143,6 +143,7 @@ bt.triggerEvent = (function(){
 
 // Load modules
 bt.security = require('./bt_data/security.js')(bt); 
+bt.importer = require('./bt_data/importer.js')(bt); 
 bt.users = require('./bt_data/users.js')(bt);
 bt.chat = require('./bt_data/chat.js')(bt);
 bt.util = require('./bt_data/util.js')(bt);

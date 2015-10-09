@@ -4,6 +4,8 @@
 var bt = (function (bt,module_name) {
 
 	const DOMID_PLITEMS = "plitems";
+	const DOMID_PLCONTROLS = "playlistcontrols";
+	const DOMID_PLQUEUETB = "queuetb";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -16,6 +18,7 @@ var bt = (function (bt,module_name) {
 	BTScroller.init(playlist.list);
 	
 	var nodeIndex = function(element){
+		if(!element) return false;
 		return Array.prototype.indexOf.call(element.parentNode.children, element);
 	}
 	
@@ -26,6 +29,9 @@ var bt = (function (bt,module_name) {
 			for(var i=0;i<data.length;i++){
 				playlist.addItem(data[i]);
 			}
+			bt.rawEmit(module_name,"getactive","pls").then(function(active){
+				playlist.e.active(active); // perfect use case of this stuff
+			});
 			done();
 		});
 	}
@@ -48,6 +54,7 @@ var bt = (function (bt,module_name) {
 				target.classList.remove("target");
 				target.classList.remove("below");
 			}
+			target = false;
 			if(!elem) return;
 			target = elem;
 			target.classList.add("target");
@@ -99,6 +106,7 @@ var bt = (function (bt,module_name) {
 			} else {
 				setAsTarget();
 			}
+			
 		}
 		
 		var pauseEvent = function(e){
@@ -133,14 +141,15 @@ var bt = (function (bt,module_name) {
 			if(!elem.dragging) return;
 			document.body.removeEventListener("mousemove",move);
 			ghost.parentNode.removeChild(ghost);
-			setAsTarget();
+			
 			elem.dragging = false;
 			pauseEvent(ev);
 			
 			var fromindex = nodeIndex(elem);
 			var toindex = nodeIndex(target);
-			playlist.move(elem,target,toindex-fromindex);
+			if(fromindex !== false && toindex !== false) playlist.move(elem,target,toindex-fromindex);
 			
+			setAsTarget();
 			return false;
 		}
 		
@@ -216,6 +225,69 @@ var bt = (function (bt,module_name) {
 		});
 	}
 	
+	playlist.queueVideo = function(url,other){
+		var data = { url:url };
+		if(other) data.volat = other.volat || false;
+		bt.rawEmit(module_name,"queue",data);
+		console.log(data);
+	}
+	
+	playlist.e.active = function(data){
+		if(playlist.activeTrack) playlist.activeTrack.classList.remove("active");
+		playlist.activeTrack = playlist.map[data.video.id];
+		if(playlist.activeTrack) playlist.activeTrack.classList.add("active");		
+	}
+	
+	// Getting into some of the playlist controls.
+	//const DOMID_PLCONTROLS = "playlistcontrols";
+	playlist.activeControlBtn = false;
+	playlist.activePane = false;
+	playlist.showPaneButton = function(elem){
+		elem.addEventListener("click",function(){
+		
+			// Toggle Button
+			if(playlist.activeControlBtn){
+				playlist.activeControlBtn.classList.remove("active");
+			}
+			if(playlist.activeControlBtn != this){
+				playlist.activeControlBtn = this;
+				playlist.activeControlBtn.classList.add("active");
+			} else {
+				playlist.activeControlBtn = false;
+			}
+			
+			// Toggle Pane
+			var pane = false;
+			if(playlist.activeControlBtn){
+				var paneId = playlist.activeControlBtn.getAttribute("pane");
+				pane = document.getElementById(paneId);
+			}
+			
+			if(playlist.activePane){
+				playlist.activePane.classList.remove("active");
+			}
+			if(pane && playlist.activePane != pane){
+				playlist.activePane = pane;
+				playlist.activePane.classList.add("active");
+			} else {
+				playlist.activePane = false;
+			} 
+			
+		});
+	}
+	
+	playlist.controlgroup = document.getElementById(DOMID_PLCONTROLS);
+	var buttons = bt.playlist.controlgroup.childNodes;
+	for(var i=0;i<buttons.length;i++){
+		playlist.showPaneButton(buttons[i]);
+	}
+	
+	// configure the queue tb and buttons
+	playlist.queuetb = document.getElementById(DOMID_PLQUEUETB);
+	playlist.queuetb.addEventListener("keyup",function(e){
+		if(e && e.keyCode != 13) return false;
+		playlist.queueVideo(this.value);
+	});
 	
 	return bt;
 }(bt,"playlist"));

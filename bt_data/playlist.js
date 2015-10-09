@@ -11,6 +11,7 @@ module.exports = function(bt){
 	
 	var lnFirst = false;
 	var lnLast = false;
+	var lnActive = false;
 	var lnIndex = 0; 
 	var lnMap = {};
 	
@@ -230,12 +231,64 @@ module.exports = function(bt){
 		});
 	};
 	
+	mod.sendActive = function(socket){
+		socket.emit(module_name,{
+			ev:"active",
+			data: {
+				video:mod.simplePlItem(lnActive),
+				at: mod.timeSinceStart
+			}
+		});
+	}
+	
+	mod.setActive = function(video){
+		lnActive = video;
+		mod.timeSinceStart = -2; // TODO make this configurable
+		savePlaylist("main"); // Maybe? 
+		console.log("swapping to",video);
+		mod.sendActive(bt.io);
+	}
+	
+	mod.e.getactive = function(){
+		return {
+			video:mod.simplePlItem(lnActive),
+			at: mod.timeSinceStart
+		}
+	} 
+	
+	mod.e.queue = function(data,socket){
+		return bt.security.soft(socket,"playlist-queue").then(function(){
+			return bt.importer.get(data.url).then(function(video){
+				lnLast.append(new LinkedNode({data:video}));
+			});
+		});
+	}
+	
+	
 	// we need to start a sort of subtask
 	mod.timeSinceStart = -2; // TODO make this configurable
-	mod.lastCheckAt
+	mod.lastCheckAt = +(new Date());
 	mod.timer = setInterval(function(){mod.clockTick();},1000);
 	mod.clockTick = function(){
 		
+		var now = +(new Date());
+		var elapsed = (now - mod.lastCheckAt) / 1000;
+		mod.lastCheckAt = now;
+		
+		// Ensure something is playing, OR just fuck off and wait.
+		if(!lnActive) lnActive = lnFirst;
+		if(!lnActive) return;
+		
+		// Add delta to current counter.
+		mod.timeSinceStart += elapsed;
+		if(lnActive && lnActive.data && lnActive.data.length){
+			if(mod.timeSinceStart > lnActive.data.length + 3){ // TODO make the +3 configurable
+				mod.setActive(lnActive.next);
+			}
+		} else {
+			return;
+		}
+		console.log(mod.timeSinceStart);
 		
 	}
 		

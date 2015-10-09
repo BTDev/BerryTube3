@@ -1,3 +1,14 @@
+@require "includes/mixins.styl"
+
+@keyframes wiggle {
+  from {
+    transform: translateX(-10px);
+  }
+  to {
+    transform: translateX(10px);
+  }
+}
+
 // GLOBALS
 main-site-wrapper-width = 1200px;
 	
@@ -11,7 +22,7 @@ body{
 	
 }
 
-#root {
+#root { 
 	width:main-site-wrapper-width;
 	margin:0 auto;
 }
@@ -28,15 +39,81 @@ body{
 	position relative 
 	color:white;
 	
+	#playlistcontrols {
+		height:0;
+		top:0;
+		width:100%;
+		position:absolute;
+		transition: 0.5s all;
+		background:green;
+		overflow: hidden;
+		
+		body[data-bt-playlist-options=true] & { height:10%; } 
+		
+		button {
+			border: 1px solid;
+			bottom: 0;
+			box-sizing: border-box;
+			height: 90%;
+			margin: auto 2px;
+			position: absolute;
+			top: 0;
+			display:none;
+			transition: 0.5s all;
+			body[data-bt-playlist-queue=true] & { display:block; }
+			&.active {
+				background: black none repeat scroll 0 0;
+				border: 1px solid gold;
+				color: gold;
+			}
+		}
+		
+	}
+	
+	.pane {
+		background: black
+		border-style: solid;
+		opacity: 0;
+		border-width: 0 1px 1px;
+		height: 0;
+		left: 0;
+		margin: 0 auto;
+		position: absolute;
+		right: 0;
+		top: 10%;
+		width: 80%;
+		transition: 0.5s all;
+		overflow:hidden;
+		&.active {
+			height:160px; 
+			opacity:1
+		}
+		
+		// queuepane
+		&#queuepane.active{ height:40px; }
+		
+	}
+	
+	#queuetb {
+		box-sizing: border-box;
+		height: 30px;
+		margin: 5px;
+		width: 315px;
+	}
+	
 	.scrollwrapper {
 	
 		height:100%;
+		width: 100%;
+		position:absolute;
+		transition: 0.5s all;
+		body[data-bt-playlist-options=true] & { 
+			height:90%;
+			bottom:0;
+		}
 	
 		#plitems {
-			margin-right:20px;
-			
-			// Playlist items here are broken out below mostly because of ghosting
-			
+			margin-right:20px;	
 		}
 		
 		.scrolltrack {
@@ -62,8 +139,7 @@ body{
 	position: relative;
 	border: 1px solid;
 	margin: 2px;
-	overflow hidden
-
+	
 	.handle{
 	
 		// Only show on perms
@@ -93,6 +169,8 @@ body{
 		// Only show on perms
 		body[data-bt-playlist-sort=true] & { margin-left:5%; }
 		transition: 0.5s all;
+		overflow: hidden;
+		height: 100%;
 	
 		margin-left:0;
 	}
@@ -100,13 +178,12 @@ body{
 	&.target { 
 		background:green;
 		
-		&.below:after {
+		$arrow{
 			display: block;
 			content: "\f060";
 			font-family: "FontAwesome";
 			height: 60px;
 			position: absolute;
-			bottom: -30px;
 			left: 30px;
 			line-height: 60px;
 			width: 30px;
@@ -114,22 +191,17 @@ body{
 			z-index: 1;
 			font-size: 30px;
 			pointer-events: none;
+			animation 0.3s ease alternate infinite wiggle;
+		}
+		
+		&.below:after {
+			@extend .playlistitem.target $arrow
+			bottom: -30px;
 		}
 		
 		&.above:before {
-			display: block;
-			content: "\f060";
-			font-family: "FontAwesome";
-			height: 60px;
-			position: absolute;
+			@extend .playlistitem.target $arrow
 			top: -30px;
-			left: 30px;
-			line-height: 60px;
-			width: 30px;
-			box-sizing: border-box;
-			z-index: 1;
-			font-size: 30px;
-			pointer-events: none;
 		}
 		
 	}
@@ -140,6 +212,10 @@ body{
 		background-color: black;
 		color: white;
 		opacity: 0.5;
+	}
+	
+	&.active {
+		background: rgb(0, 160, 160) none repeat scroll 0 0;
 	}
 }
 
