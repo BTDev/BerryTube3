@@ -178,7 +178,7 @@ var bt = (function (bt,module_name) {
 		bt.rawEmit(module_name,"move",pak);
 	}
 	
-	platylist.vslidespeed = 175;
+	playlist.vslidespeed = 175;
 	playlist.e.move = function(data){
 	
 		playlist.evqueue.run(function(done){
@@ -200,10 +200,10 @@ var bt = (function (bt,module_name) {
 				
 				// save height
 				var temp = from.clientHeight;
-				tween(from,"height","0px",temp+"px",platylist.vslidespeed).then(function(){
+				tween(from,"height","0px",temp+"px",playlist.vslidespeed).then(function(){
 					playlist.list.insertBefore(from,aft.nextSibling);
 				}).then(function(){
-					return tween(from,"height",temp+"px","0px",platylist.vslidespeed);
+					return tween(from,"height",temp+"px","0px",playlist.vslidespeed);
 				}).then(function(){
 					done();		
 				})
@@ -215,10 +215,10 @@ var bt = (function (bt,module_name) {
 				if(!aft) return;
 				
 				var temp = from.clientHeight;
-				tween(from,"height","0px",temp+"px",platylist.vslidespeed).then(function(){
+				tween(from,"height","0px",temp+"px",playlist.vslidespeed).then(function(){
 					playlist.list.insertBefore(from,aft);
 				}).then(function(){
-					return tween(from,"height",temp+"px","0px",platylist.vslidespeed);
+					return tween(from,"height",temp+"px","0px",playlist.vslidespeed);
 				}).then(function(){
 					done();		
 				})
