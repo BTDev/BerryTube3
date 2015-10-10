@@ -231,17 +231,18 @@ var bt = (function (bt,module_name) {
 		var data = { url:url };
 		if(other) data.volat = other.volat || false;
 		bt.rawEmit(module_name,"queue",data);
-		console.log(data);
 	}
 	
 	playlist.e.active = function(data){
 		if(playlist.activeTrack) playlist.activeTrack.classList.remove("active");
 		playlist.activeTrack = playlist.map[data.video.id];
 		if(playlist.activeTrack) playlist.activeTrack.classList.add("active");		
+		console.log("active",data);
+		bt.player.play(data.video.data.source,data.video.data.key,data.at);
 	}
 	
 	// Getting into some of the playlist controls.
-	//const DOMID_PLCONTROLS = "playlistcontrols";
+	//const DOMID_PLCONTROLS = "playlistcontrols"; 
 	playlist.activeControlBtn = false;
 	playlist.activePane = false;
 	playlist.showPaneButton = function(elem){

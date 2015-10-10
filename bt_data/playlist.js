@@ -288,7 +288,7 @@ module.exports = function(bt){
 		} else {
 			return;
 		}
-		
+		console.log(mod.timeSinceStart);
 	};
 		
 	bt.io.on("connection",function(socket){
