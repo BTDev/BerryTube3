@@ -4,6 +4,7 @@
 var bt = (function (bt,module_name) {
 
 	const DOMID_USERLIST = "userlist";
+	const DOMID_USERCOUNT = "usercount";
 	
 	var userlist = bt.userlist = { e:bt.register(module_name) }; 
 	
@@ -12,13 +13,19 @@ var bt = (function (bt,module_name) {
 	userlist.getUserlistControls = Q.Promise(function(resolve,reject){
 	
 		var find = function(){
+		
 			// define list
 			var list = document.getElementById(DOMID_USERLIST);
 			if(!list) return false;
 			var lists = list.getElementsByClassName("list");
+
+			// define count
+			var count = document.getElementById(DOMID_USERCOUNT);
+			if(!count) return false;
 			
 			return { 
 				lists:lists,
+				count:count,
 			}
 			
 		};
@@ -34,6 +41,9 @@ var bt = (function (bt,module_name) {
 	});
 	
 	userlist.updateUserCount = function(amt){
+		userlist.getUserlistControls.done(function(controls){
+			controls.count.innerHTML = amt;
+		});
 		console.log("updateUserCount",amt);
 	};
 	

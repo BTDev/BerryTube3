@@ -1,4 +1,6 @@
-var EventQueue = function(){
+var EventQueue = function(ttl){
+
+	ttl = ttl || 5000;
 
   return {
     
@@ -6,22 +8,31 @@ var EventQueue = function(){
 
       var eventstack = [];
       var running = false;
+	  var timeout = false;
 
       var popAndPerform = function(){
 
+		if(timeout) clearTimeout(timeout);
         var action = eventstack.shift();
 
         if(!action){
           running = false;
+		  if(timeout) clearTimeout(timeout);
           return;
         }
+		
+		timeout = setTimeout(function(){
+			console.error(new Error("EventQueue Blocked!"));
+			console.error(action.toString());
+		},ttl);
 
         running = true;
 
         var res = new Q.Promise(action);
         res.then(function(){
           popAndPerform();
-        })
+        });
+		
       }
 
       return function(cb){

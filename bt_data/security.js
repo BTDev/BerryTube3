@@ -17,6 +17,19 @@ module.exports = function(bt){
 		});
 	}
 	
+	mod.hard = function(socket,perm){
+		var sec = mod.soft(socket,perm);
+		sec.catch(function(){
+			mod.kick(socket);
+		})
+		return sec;
+	}
+	
+	mod.kick = function(socket){
+		socket.disconnect();
+		console.log("Disconnected socket for illegal activity");
+	}
+	
 	return mod;
 
 }

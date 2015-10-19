@@ -86,6 +86,7 @@ module.exports = function(bt){
 		// at 1 node created per second, it would take 2.845x10^8 years ( roughly 1/16th the age of earth)
 		// to reach that number. And thats assuming one unbroken process, since these ID's are lost on reboot anyway 
 		self.id = (lnIndex++).toString(36);
+		lnMap[self.id] = self;
 				
 		self.append = function(otherLN){
 			
@@ -165,6 +166,23 @@ module.exports = function(bt){
 			// return self for chaining.
 			return self;
 		};
+		
+		self.remove = function(){
+		
+			// you must remove yourself from the equation, Quorra.
+			if(self.prev) self.prev.next = self.next;
+			if(self.next) self.next.prev = self.prev;
+			if(lnFirst == self) lnFirst = self.next; 
+			if(lnLast == self) lnLast = self.prev; 
+
+			console.log("removing");
+			bt.io.emit(module_name,{
+				ev:"remove",
+				data:mod.simplePlItem(self)
+			});
+		
+			return self;
+		}
 		
 		return self;
 		
@@ -261,6 +279,12 @@ module.exports = function(bt){
 			return bt.importer.get(data.url).then(function(video){
 				lnLast.append(new LinkedNode({data:video}));
 			});
+		});
+	};
+	
+	mod.e.remove = function(data,socket){
+		return bt.security.hard(socket,"playlist-delete").then(function(){
+			lnMap[data] && lnMap[data].remove();
 		});
 	};
 	

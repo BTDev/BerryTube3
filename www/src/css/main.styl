@@ -139,6 +139,7 @@ body{
 	position: relative;
 	border: 1px solid;
 	margin: 2px;
+	font-size: 14px;
 	
 	.handle{
 	
@@ -171,8 +172,40 @@ body{
 		transition: 0.5s all;
 		overflow: hidden;
 		height: 100%;
-	
+		padding: 0 4px;
 		margin-left:0;
+	}
+	
+	.quickactions {
+		float: right;
+		overflow: hidden;
+		height: 100%;
+		
+		& > div {
+			transition: all 0.25s;
+			background: rgba(0,0,0,0.5);
+			&:hover{
+				background: rgba(255, 225, 0, 0.5)
+			}
+		}
+		
+		.del {
+		
+			// Only show on perms
+			body[data-bt-playlist-delete=true] & { width:15px; padding: 0 2px; }
+
+			padding: 0 0px;
+			color: red;
+			overflow: hidden;
+			text-align: center;
+			width: 0;
+			cursor:pointer;
+			
+			&:after{
+				content: "\f014";
+				font-family: "FontAwesome";
+			}
+		}
 	}
 	
 	&.target { 
@@ -228,6 +261,7 @@ body{
 	social-height = 350px;
 	social-input-height = 30px;
 	social-userlist-width = 150px;
+	social-usercount-height = 20px;
 	
 	width: social-width;
 	position relative
@@ -307,16 +341,34 @@ body{
 	}
 
 	#userlist {
+	
 		float right
 		width social-userlist-width
 		background white
 		height 100%
+		position: relative;
+		
+		#usercount {
+			text-align:center;
+			border: 1px solid;
+			box-sizing: border-box;
+			height: social-usercount-height
+			width: 100%;
+			position: absolute;
+			font-size: 11px;
+			line-height: 20px;
+			&:after{
+				content: " Connected Users";
+			}
+		}
 		
 		.list {
 			border: 1px solid;
 			box-sizing: border-box;
-			height: 100%;
+			height: social-height - social-usercount-height
 			width: 100%;
+			position: absolute;
+			bottom: 0;
 			
 			.user {
 				font-weight: bold;

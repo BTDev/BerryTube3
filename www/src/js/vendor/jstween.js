@@ -23,7 +23,24 @@ function tween(el,prop,to,from,duration) {
 		
 		var speed = duration / Math.abs(to-from);
 		var last = +new Date();
+		var ttimeout = false;
+		var abort = false;
+		
+		var abortfunc = function(){
+			console.log("animation hanging, skipping.");
+			abort = true;
+			el.style[prop] = to+tosuf;
+			resolve();
+		}
+		
 		var tick = function() {
+		
+			if(abort) return;
+			if(ttimeout){
+				console.log("clearing tick timeout");
+				clearTimeout(ttimeout);
+			}
+		
 			if(to > from){
 				from = from + (new Date() - last) / speed;
 				if(from >= to){
@@ -40,13 +57,20 @@ function tween(el,prop,to,from,duration) {
 					(window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16)
 				}
 			}
+			
 			// update value 
 			last = +new Date();
 			el.style[prop] = from+tosuf;
 			if(from == to){
-				console.log(from,to,"done!");
+				if(ttimeout) clearTimeout(ttimeout);
 				resolve();
+			} else {
+				// If a single tick takes longer than 100ms, we can assume
+				// that the browser isnt sending animation frames, or in
+				// other words, the tab isnt focused. in this event, skip to the end.
+				ttimeout = setTimeout(abortfunc,100);
 			}
+			
 		};
 		tick();
 	})

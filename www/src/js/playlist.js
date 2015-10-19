@@ -70,11 +70,26 @@ var bt = (function (bt,module_name) {
 		elem.handle.classList.add("handle");
 		elem.handle.innerHTML = '<i class="fa fa-bars"></i>';
 		elem.appendChild(elem.handle);
+		
+		// Add quick controls
+		elem.quick = document.createElement("div");
+		elem.quick.classList.add("quickactions");
+		elem.appendChild(elem.quick);
+		
+		// Add del to quick
+		elem.del = document.createElement("div");
+		elem.del.classList.add("del");
+		elem.quick.appendChild(elem.del);
+		elem.killself = function(){
+			// hate self
+			bt.rawEmit(module_name,"remove",elem.item.id);
+		}
+		elem.del.addEventListener("click",elem.killself);
+		
+		// Add content
 		elem.content = document.createElement("div");
 		elem.content.classList.add("content");
-		
 		elem.content.innerHTML = item.data.title;
-		
 		elem.appendChild(elem.content);
 		
 		var move = function(ev){
@@ -223,6 +238,21 @@ var bt = (function (bt,module_name) {
 					done();		
 				})
 			}		
+			
+		});
+	}
+	
+	
+	playlist.e.remove = function(data){
+		playlist.evqueue.run(function(done){
+		
+			var el = playlist.map[data.id];
+			
+			var temp = el.clientHeight;
+			tween(el,"height","0px",el.clientHeight+"px",playlist.vslidespeed).then(function(){
+				el.parentNode.removeChild(el);	
+				done();
+			});
 			
 		});
 	}
