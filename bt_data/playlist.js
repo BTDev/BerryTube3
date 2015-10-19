@@ -175,6 +175,8 @@ module.exports = function(bt){
 			if(lnFirst == self) lnFirst = self.next; 
 			if(lnLast == self) lnLast = self.prev; 
 
+			if(self.next && lnActive == self) mod.setActive(self.next);
+			
 			console.log("removing");
 			bt.io.emit(module_name,{
 				ev:"remove",
