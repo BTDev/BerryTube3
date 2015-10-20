@@ -23,16 +23,21 @@ var bt = (function (bt,module_name) {
 	}
 	
 	playlist.e.fulllist = function(data){
-		console.log(data);
 		playlist.evqueue.run(function(done){
 			playlist.clear();
 			for(var i=0;i<data.length;i++){
 				playlist.addItem(data[i]);
 			}
-			bt.rawEmit(module_name,"getactive","pls").then(function(active){
+			var resp = bt.rawEmit(module_name,"getactive","pls");
+			resp.then(function(active){
 				playlist.e.active(active); // perfect use case of this stuff
+			}).then(function(){
+				bt.rawEmit(module_name,"getpointer","pls").then(function(pointer){
+					playlist.setPointer(playlist.map[pointer.id]);
+					done();
+				});
 			});
-			done();
+			//done();
 		});
 	}
 	
@@ -195,10 +200,7 @@ var bt = (function (bt,module_name) {
 	
 	playlist.vslidespeed = 175;
 	playlist.e.move = function(data){
-	
 		playlist.evqueue.run(function(done){
-
-			console.log(playlist.map[data.from.id]);
 			var from = false;
 			
 			if(playlist.map[data.from.id]){
@@ -257,6 +259,25 @@ var bt = (function (bt,module_name) {
 		});
 	}
 	
+	// TODO: This can race the creation of the element on the client.
+	playlist.e.pointer = function(data){
+		playlist.evqueue.run(function(done){
+			if(data) { 
+				var el = playlist.map[data.id];
+				playlist.setPointer(el);
+			}
+			else playlist.setPointer(false);
+			
+			done();
+		});
+	}
+	
+	playlist.setPointer = function(video){
+		if(playlist.pointer) playlist.pointer.classList.remove("pointer");
+		playlist.pointer = video;
+		if(playlist.pointer) playlist.pointer.classList.add("pointer");
+	}
+	
 	playlist.queueVideo = function(url,other){
 		var data = { url:url };
 		if(other) data.volat = other.volat || false;
@@ -267,7 +288,6 @@ var bt = (function (bt,module_name) {
 		if(playlist.activeTrack) playlist.activeTrack.classList.remove("active");
 		playlist.activeTrack = playlist.map[data.video.id];
 		if(playlist.activeTrack) playlist.activeTrack.classList.add("active");		
-		console.log("active",data);
 		bt.player.play(data.video.data.source,data.video.data.key,data.at);
 	}
 	

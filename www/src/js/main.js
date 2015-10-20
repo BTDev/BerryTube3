@@ -30,7 +30,7 @@ var bt = (function () {
 		// only this thing ever needs. This way its declared once, but still 
 		// only accessible to the returned function. Cleanliness!
 		var ifEventValid = function(ev,cb){
-			if(ev && ev.ev && ev.data) if(cb)cb();
+			if(ev && typeof ev.ev != "undefined" && typeof ev.data != "undefined") if(cb)cb();
 		}
 		
 		return function(evname){

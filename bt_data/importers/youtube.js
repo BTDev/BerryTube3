@@ -92,8 +92,8 @@ module.exports = function(bt){
 				res.on('end', function (chunk) {
 					//console.log(buffer);
 					var returned = JSON.parse(buffer);
-					if(!returned.items) throw new Error(buffer);
-					if(!returned.items[0]) throw new Error(buffer);
+					if(!returned.items) return reject(new Error(buffer));
+					if(!returned.items[0]) return reject(new Error(buffer));
 					resolve(returned.items[0]);
 				});
 

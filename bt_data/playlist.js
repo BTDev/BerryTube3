@@ -12,6 +12,7 @@ module.exports = function(bt){
 	var lnFirst = false;
 	var lnLast = false;
 	var lnActive = false;
+	var lnPointer = false;
 	var lnIndex = 0; 
 	var lnMap = {};
 	
@@ -97,6 +98,7 @@ module.exports = function(bt){
 			if(otherLN.next) otherLN.next.prev = otherLN.prev;
 			if(lnFirst == otherLN) lnFirst = otherLN.next; // if we just moved the first one after me, the one after him is now first.
 			if(lnLast == otherLN) lnLast = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
+			if(lnPointer == otherLN) mod.setPointer(otherLN.prev);
 			
 			// Line up others next and prev to mine
 			otherLN.next = self.next;
@@ -137,7 +139,8 @@ module.exports = function(bt){
 			if(otherLN.next) otherLN.next.prev = otherLN.prev;
 			if(lnFirst == otherLN) lnFirst = otherLN.next; // if we just moved the first one after me, the one after him is now first.
 			if(lnLast == otherLN) lnLast = otherLN.prev; // if we just moved the last one after me, the one before him is now first.
-
+			if(lnPointer == otherLN) mod.setPointer(otherLN.prev);
+			
 			// Line up others next and prev to mine
 			otherLN.next = self;
 			otherLN.prev = self.prev;
@@ -176,6 +179,7 @@ module.exports = function(bt){
 			if(lnLast == self) lnLast = self.prev; 
 
 			if(self.next && lnActive == self) mod.setActive(self.next);
+			if(lnPointer == self) mod.setPointer(self.prev);
 			
 			console.log("removing");
 			bt.io.emit(module_name,{
@@ -234,6 +238,7 @@ module.exports = function(bt){
 	});
 	
 	mod.simplePlItem = function(elem){
+		if(!elem) return elem;
 		return {data:elem.data,id:elem.id};
 	};
 	
@@ -263,10 +268,35 @@ module.exports = function(bt){
 	
 	mod.setActive = function(video){
 		lnActive = video;
+		if(lnPointer == lnActive) mod.setPointer(false);
 		mod.timeSinceStart = -2; // TODO make this configurable
 		savePlaylist("main"); // Maybe? 
 		console.log("swapping to",video);
 		mod.sendActive(bt.io);
+	};
+	
+	mod.setPointer = function(video){
+		if(video == lnActive || !video) {
+			lnPointer = false;
+			console.log("set pointer to",video);
+			bt.io.emit(module_name,{
+				ev:"pointer",
+				data:lnPointer
+			});
+		} else {
+			lnPointer = video;
+			console.log("set pointer to",video.data.title);
+			bt.io.emit(module_name,{
+				ev:"pointer",
+				data:mod.simplePlItem(lnPointer)
+			});
+		}
+		
+		
+	}
+	
+	mod.e.getpointer = function(data,socket){
+		return mod.simplePlItem(lnPointer)
 	};
 	
 	mod.e.getactive = function(){
@@ -279,7 +309,15 @@ module.exports = function(bt){
 	mod.e.queue = function(data,socket){
 		return bt.security.soft(socket,"playlist-queue").then(function(){
 			return bt.importer.get(data.url).then(function(video){
-				lnLast.append(new LinkedNode({data:video}));
+				if(lnPointer) {
+					var newbie = new LinkedNode({data:video});
+					lnPointer.append(newbie);
+					mod.setPointer(newbie);
+				} else {
+					var newbie = new LinkedNode({data:video});
+					lnActive.append(newbie);
+					mod.setPointer(newbie);
+				}
 			});
 		});
 	};
@@ -289,6 +327,7 @@ module.exports = function(bt){
 			lnMap[data] && lnMap[data].remove();
 		});
 	};
+	
 	
 	
 	// we need to start a sort of subtask
@@ -314,7 +353,7 @@ module.exports = function(bt){
 		} else {
 			return;
 		}
-		console.log(mod.timeSinceStart);
+		//console.log(mod.timeSinceStart);
 	};
 		
 	bt.io.on("connection",function(socket){
@@ -323,7 +362,7 @@ module.exports = function(bt){
 				ev:"fulllist",
 				data: list
 			});
-		});
+		});		
 	});
 	
 	return mod;
