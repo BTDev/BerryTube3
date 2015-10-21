@@ -6,6 +6,7 @@ var bt = (function (bt,module_name) {
 	const DOMID_PLITEMS = "plitems";
 	const DOMID_PLCONTROLS = "playlistcontrols";
 	const DOMID_PLQUEUETB = "queuetb";
+	const DOMID_PLQUEUEPANE = "queuepane";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -296,7 +297,7 @@ var bt = (function (bt,module_name) {
 	playlist.activeControlBtn = false;
 	playlist.activePane = false;
 	playlist.showPaneButton = function(elem){
-		elem.addEventListener("click",function(){
+		elem.clickFn = function(){
 		
 			// Toggle Button
 			if(playlist.activeControlBtn){
@@ -326,7 +327,8 @@ var bt = (function (bt,module_name) {
 				playlist.activePane = false;
 			} 
 			
-		});
+		}
+		elem.addEventListener("click",elem.clickFn);
 	}
 	
 	playlist.controlgroup = document.getElementById(DOMID_PLCONTROLS);
@@ -340,7 +342,19 @@ var bt = (function (bt,module_name) {
 	playlist.queuetb.addEventListener("keyup",function(e){
 		if(e && e.keyCode != 13) return false;
 		playlist.queueVideo(this.value);
+		this.value="";
+		playlist.activeControlBtn.clickFn();
 	});
+	
+	// configure the queue buttons
+	playlist.queuepane = document.getElementById(DOMID_PLQUEUEPANE);
+	var btns = playlist.queuepane.getElementsByClassName("queuebtn");
+	var qFromBtn = function(){
+		playlist.queueVideo(playlist.queuetb.value);
+		playlist.queuetb.value="";
+		playlist.activeControlBtn.clickFn();
+	}
+	for(var i=0;i<btns.length;i++)  btns[i].addEventListener("click",qFromBtn);
 	
 	return bt;
 }(bt,"playlist"));
