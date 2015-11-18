@@ -36,12 +36,12 @@ var bt = (function (bt) {
 						window.player = ip;
 					},
 				},
-                playerVars:{
-                    rel: false,
-                    modestbranding: true,
-                    autohide: 1,
-                    showinfo: 0,
-                }
+				playerVars:{
+					rel: false,
+					modestbranding: true,
+					autohide: 1,
+					showinfo: 0,
+				}
 			});
 		});
 	});
