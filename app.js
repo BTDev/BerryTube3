@@ -65,6 +65,12 @@ bt.dbPlaylist = new Promise(function(resolve,reject){
 	});
 });
 
+bt.dbPlugs = new Promise(function(resolve,reject){
+	bt.dbConnection.done(function(db){
+		resolve(db.collection('plugs'));	
+	});
+});
+
 // Define event registrar & emitter
 bt.register = (function(){
 
