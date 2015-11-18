@@ -284,7 +284,7 @@ var bt = (function (bt,module_name) {
 	
 	playlist.queueVideo = function(url,other){
 		var data = { url:url };
-		if(other) data.volat = other.volat || false;
+		if(other && other == 'volat') data.volat = 'volat';
 		bt.rawEmit(module_name,"queue",data);
 	}
 	
@@ -353,7 +353,7 @@ var bt = (function (bt,module_name) {
 	playlist.queuepane = document.getElementById(DOMID_PLQUEUEPANE);
 	var btns = playlist.queuepane.getElementsByClassName("queuebtn");
 	var qFromBtn = function(){
-		playlist.queueVideo(playlist.queuetb.value);
+		playlist.queueVideo(playlist.queuetb.value,this.getAttribute("type"));
 		playlist.queuetb.value="";
 		playlist.activeControlBtn.clickFn();
 	}

@@ -79,6 +79,9 @@ module.exports = function(bt){
 		self.data = init.data || {};
 		self.next = init.next || self;
 		self.prev = init.prev || self;
+		
+		self.data.volat = init.volat || false;
+		
 		if(!lnFirst) lnFirst = self;
 		if(!lnLast) lnLast = self;
 		
@@ -189,6 +192,16 @@ module.exports = function(bt){
 			return self;
 		}
 		
+		self.setVolatile = function(state){
+		
+			self.data.volat = self.data.volat || false;
+			self.data.volat = !!state;
+			console.log("volat!",self.data);
+			mod.updateVideo(self);
+			
+			return self;
+		}
+		
 		return self;
 		
 	};
@@ -293,6 +306,13 @@ module.exports = function(bt){
 		
 	}
 	
+	mod.updateVideo = function(video){
+		bt.io.emit(module_name,{
+			ev:"update",
+			data:mod.simplePlItem(video)
+		});
+	}
+	
 	mod.e.getpointer = function(data,socket){
 		return mod.simplePlItem(lnPointer)
 	};
@@ -307,15 +327,19 @@ module.exports = function(bt){
 	mod.e.queue = function(data,socket){
 		return bt.security.soft(socket,"playlist-queue").then(function(){
 			return bt.importer.get(data.url).then(function(video){
+				var init = {
+					data:video,
+				};
+				if(data.volat) init.volat = !!data.volat;
+				var newbie = new LinkedNode(init);
 				if(lnPointer) {
-					var newbie = new LinkedNode({data:video});
 					lnPointer.append(newbie);
-					mod.setPointer(newbie);
 				} else {
-					var newbie = new LinkedNode({data:video});
 					lnActive.append(newbie);
-					mod.setPointer(newbie);
 				}
+				//console.log(data);
+				//if(data.volat) newbie.setVolatile(true);
+				mod.setPointer(newbie);
 			});
 		});
 	};
@@ -327,7 +351,7 @@ module.exports = function(bt){
 	};
 	
 	mod.playNext = function(){
-		if(lnActive.data.volat || !lnActive.removing){
+		if(lnActive.data.volat){
 			lnActive.remove();
 		} else {
 			mod.setActive(lnActive.next);
