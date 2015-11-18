@@ -35,6 +35,12 @@ var bt = (function (bt) {
 						resolve(ip);
 						window.player = ip;
 					},
+				},
+				playerVars:{
+					rel: false,
+					modestbranding: true,
+					autohide: 1,
+					showinfo: 0,
 				}
 			});
 		});
