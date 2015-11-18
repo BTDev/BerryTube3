@@ -71,6 +71,9 @@ var bt = (function (bt,module_name) {
 		elem.item = item;
 		playlist.map[elem.item.id] = elem;
 		
+		// Add any video flegs
+		if(elem.item.data.volat) elem.classList.add("volatile");
+		
 		// create drag handle
 		elem.handle =  document.createElement("div");
 		elem.handle.classList.add("handle");

@@ -181,7 +181,6 @@ module.exports = function(bt){
 			if(self.next && lnActive == self) mod.setActive(self.next);
 			if(lnPointer == self) mod.setPointer(self.prev);
 			
-			console.log("removing");
 			bt.io.emit(module_name,{
 				ev:"remove",
 				data:mod.simplePlItem(self)
@@ -271,7 +270,6 @@ module.exports = function(bt){
 		if(lnPointer == lnActive) mod.setPointer(false);
 		mod.timeSinceStart = -2; // TODO make this configurable
 		savePlaylist("main"); // Maybe? 
-		console.log("swapping to",video);
 		mod.sendActive(bt.io);
 	};
 	
@@ -328,7 +326,13 @@ module.exports = function(bt){
 		});
 	};
 	
-	
+	mod.playNext = function(){
+		if(lnActive.data.volat || !lnActive.removing){
+			lnActive.remove();
+		} else {
+			mod.setActive(lnActive.next);
+		}
+	}
 	
 	// we need to start a sort of subtask
 	mod.timeSinceStart = -2; // TODO make this configurable
@@ -348,7 +352,7 @@ module.exports = function(bt){
 		mod.timeSinceStart += elapsed;
 		if(lnActive && lnActive.data && lnActive.data.length){
 			if(mod.timeSinceStart > lnActive.data.length + 3){ // TODO make the +3 configurable
-				mod.setActive(lnActive.next);
+				mod.playNext();
 			}
 		} else {
 			return;
