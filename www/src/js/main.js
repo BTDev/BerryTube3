@@ -73,7 +73,7 @@ var bt = (function () {
 	bt.rawEmit = function(ns,ev,data){
 		return Q.Promise(function(resolve,reject){
 			bt.socket.done(function(socket){
-				
+				  
 				socket.emit(ns,{
 					ev:ev,
 					data:data
@@ -82,7 +82,7 @@ var bt = (function () {
 						reject(res.data);
 					} else {
 						resolve(res.data);
-					}
+					} 
 				});
 				
 			});
@@ -95,6 +95,57 @@ var bt = (function () {
 	
 	bt.getFlag = function(flag){
 		document.body.getAttribute('data-bt-'+flag);
+	}
+	
+	bt.themes = [];
+	var activeTheme = false;
+	var activeCSS = [];
+	
+	bt.registerTheme = function(theme){
+		bt.themes.push(theme);
+		if(bt.themes.length == 1){
+			bt.activateTheme(theme);
+		}
+	}
+	
+	bt.activateTheme = function(theme){
+		
+		// get active theme.
+		var active = bt.getActiveTheme();
+		
+		if(active){
+			if(active.unload) active.unload(theme); // unload, and tell it who's next.
+			activeCSS.forEach(function(elem){
+				console.log("elem",elem);
+				elem.parentNode.removeChild(elem);
+				activeCSS.splice(activeCSS.indexOf(elem),1);
+			});
+		}
+		
+		if(theme){
+			
+			if(theme.css) {
+				theme.css.forEach(function(css){
+					var cssdom = document.createElement("link");
+					cssdom.rel = "stylesheet";
+					cssdom.href = css;
+					if(theme.name) cssdom.setAttribute("theme",theme.name);
+					document.head.appendChild(cssdom);
+					activeCSS.push(cssdom);
+				});
+			}
+			
+			if(theme.load) theme.load();
+			
+			activeTheme = theme;
+			
+		}
+		
+	}
+	
+	bt.getActiveTheme = function(){
+		if(!activeTheme) return false;
+		return activeTheme;
 	}
 	
 	return bt;

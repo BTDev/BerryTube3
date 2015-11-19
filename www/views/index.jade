@@ -8,7 +8,7 @@ html
 		script(src='js/vendor/btscroller.js')
 		script(src='js/vendor/eventqueue.js')
 		script(src='js/vendor/jstween.js')
-		script(src='js/main.min.js' async='true')
+		
 	body
 		div#root
 			div#videowrapper
@@ -19,3 +19,7 @@ html
 				include elements/userlist.jade
 				include elements/chat.jade
 			div(style="clear:both")
+			
+		//- Body done, include brain, themes
+		script(src='js/main.min.js')
+		include elements/themes.jade

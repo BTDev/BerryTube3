@@ -3,7 +3,6 @@
 */
 var bt = (function (bt,module_name) {
 
-	//var util = bt.util = { e:bt.register(module_name) }; 
 	var player = bt.player = {};
 	var individualPlayers = {};
 	

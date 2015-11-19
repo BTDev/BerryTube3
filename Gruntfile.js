@@ -44,6 +44,13 @@ module.exports = function(grunt) {
 				},
 				mangle: false,
 				banner: headerString
+			},
+			themes: {
+				files: {
+					'www/dist/css/themes/bp/theme.js': ['www/src/css/themes/bp/theme.js'],
+				},
+				mangle: false,
+				banner: headerString
 			}
 		},
 		stylus: {
