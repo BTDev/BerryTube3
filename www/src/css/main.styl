@@ -81,7 +81,7 @@ body{
 		margin: 0 auto;
 		position: absolute;
 		right: 0;
-		top: 10%;
+		top: 0%;
 		width: 80%;
 		transition: 0.5s all;
 		overflow:hidden;
@@ -90,9 +90,45 @@ body{
 			opacity:1
 		}
 		
+		body[data-bt-playlist-options=true] & { top: 10%; } 
+		
+		
 		// queuepane
 		&#queuepane.active{ height:40px; }
 		
+		.right {
+			width: 40%;
+			position: absolute;
+			right: 0;
+			top: 0;
+			height: 100%;
+			
+			.row {
+				padding: 1px;
+			}
+			
+		}
+		
+		.left {
+			width: 60%;
+			position: absolute;
+			left: 0;
+			top: 0;
+			height: 100%;
+			
+			label {
+				box-sizing: border-box;
+				display: inline-block;
+				width: 40%;
+			}
+			input {
+				box-sizing: border-box;
+				display: inline-block;
+				width: 60%;
+			}
+			
+		}
+				
 	}
 	
 	#queuetb {
@@ -411,11 +447,11 @@ body{
 		body[data-bt-logged-in=true] & { display:none; }
 	}
 	
-	
+	 
 }
 
 #vidcanvas{
-
+ 
 	canvas-height = 480px;
 
 	height: canvas-height;
@@ -423,3 +459,22 @@ body{
 	margin: 0 auto;
 	background: black none repeat scroll 0 0;
 }
+
+.bt-button {
+
+	background: black;
+	color: white;
+	border: 1px solid;
+	width: 100%;
+	box-sizing: border-box;
+			
+	&.s75 { width: 75%; }
+	&.s50 { width: 50%; }
+	&.s25 { width: 25%; }
+	
+	&:active {
+		background: rgba(255, 255, 255, 0.2)
+	}
+}
+
+.clearfix { clear: both; }

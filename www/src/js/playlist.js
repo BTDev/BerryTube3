@@ -8,6 +8,8 @@ var bt = (function (bt,module_name) {
 	const DOMID_PLQUEUETB = "queuetb";
 	const DOMID_PLQUEUEPANE = "queuepane";
 	const DOMID_PLVEDITPANE = "videoeditor";
+	
+	const DOMID_EPB_TOGGLEV = "toggle-volatile";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -22,6 +24,26 @@ var bt = (function (bt,module_name) {
 	var nodeIndex = function(element){
 		if(!element) return false;
 		return Array.prototype.indexOf.call(element.parentNode.children, element);
+	}
+	
+	playlist.getEditPaneControls = function(){
+		return new Q.Promise(function(resolve,reject){
+			(function looper(){
+			
+				var again = function(){ setTimeout(looper,1000); }
+			
+				var toggleVolatileWrapper = document.getElementById(DOMID_EPB_TOGGLEV);
+				if(!toggleVolatileWrapper) return again();
+				
+				var toggleVolatile = toggleVolatileWrapper.getElementsByTagName('button')[0];
+				if(!toggleVolatile) return again();
+				
+				resolve({
+					toggleVolatile:toggleVolatile
+				});
+								
+			})()
+		});
 	}
 	
 	playlist.e.fulllist = function(data){
@@ -325,6 +347,22 @@ var bt = (function (bt,module_name) {
 		bt.player.play(data.video.data.source,data.video.data.key,data.at);
 	}
 	
+	playlist.e.update = function(data){
+		var elem = playlist.map[data.id];
+		if(!elem) return;
+		elem.item = data;
+		playlist.regenerateEntry(elem);
+	}
+	
+	playlist.regenerateEntry = function(elem){
+		console.log(elem);
+		
+		// Check volatility.
+		if(elem.item.data.volat) elem.classList.add("volatile");
+		else elem.classList.remove("volatile");
+		
+	}
+	
 	// Getting into some of the playlist controls.
 	//const DOMID_PLCONTROLS = "playlistcontrols"; 
 	playlist.activeControlBtn = false;
@@ -411,6 +449,18 @@ var bt = (function (bt,module_name) {
 		playlist.activeControlBtn.clickFn();
 	}
 	for(var i=0;i<btns.length;i++)  btns[i].addEventListener("click",qFromBtn);
+	
+	// configure the edit controls.
+	playlist.getEditPaneControls().then(function(controls){
+		controls.toggleVolatile.addEventListener('click',function(){
+			var video = playlist.editTarget.item;
+			bt.rawEmit(module_name,"modify",{
+				id: video.id,
+				data: { volat: !video.data.volat }
+			});
+			playlist.showPane();
+		})
+	})
 	
 	return bt;
 }(bt,"playlist"));

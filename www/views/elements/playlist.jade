@@ -6,5 +6,17 @@ div#queuepane.pane
 	button(class="queuebtn",type="normal") Q
 	button(class="queuebtn",type="volat") V
 div#videoeditor.pane
-	input(name="title")
-	button Toggle Volatile
+	div.left
+		div.row
+			label Title
+			input(name="title")
+	div.right
+		div.row#open-outside
+			button.bt-button Open Externally
+		div.row#queue-next
+			button.bt-button Queue Next
+		div.row#toggle-volatile
+			button.bt-button Toggle Volatile
+			
+		div.clearfix
+	div.clearfix

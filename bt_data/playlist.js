@@ -344,6 +344,23 @@ module.exports = function(bt){
 		});
 	};
 	
+	mod.e.modify = function(data,socket){
+		// TODO this should probably do different security checks based on what exactly we are modifying. for now queue will work.
+		return bt.security.hard(socket,"playlist-queue").then(function(){
+		
+			console.log(data);
+		
+			if(!data.id) throw new Error("Invalid Video ID");
+			if(!data.data) throw new Error("Invalid Video Data");
+		
+			var video = lnMap[data.id];
+			if(!video) throw new Error("Invalid Video ID");
+
+			if(typeof data.data.volat !== 'undefined') video.setVolatile(!!data.data.volat);
+			
+		});
+	};
+	
 	mod.e.remove = function(data,socket){
 		return bt.security.hard(socket,"playlist-delete").then(function(){
 			lnMap[data] && lnMap[data].remove();
