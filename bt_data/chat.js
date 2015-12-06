@@ -20,10 +20,30 @@ module.exports = function(bt){
 			if(!data) throw new Error("No data received");
 			if(!data.message) throw new Error("No message received");
 			
-			return mod.broadcastMessage(socket.profile,data.message);
+			mod.parseMessage(data.message).then(function(parsed){
+				mod.broadcastMessage(socket.profile,parsed);
+			});
 			
 		});
 	} 
+	
+	mod.parseMessage = function(raw){
+	
+		function htmlEscape(str) {
+			return String(str)
+					.replace(/&/g, '&amp;')
+					.replace(/"/g, '&quot;')
+					.replace(/'/g, '&#39;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;');
+		}
+	
+		return new Promise(function(resolve,reject){
+			var parsed = htmlEscape(raw);
+			console.log(raw,parsed);
+			resolve(parsed);
+		});
+	}
 	
 	var messageIndex = 0;
 	var messageKeyspace = 100000000
