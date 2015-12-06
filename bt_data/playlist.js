@@ -367,6 +367,12 @@ module.exports = function(bt){
 		});
 	};
 	
+	mod.e.next = function(data,socket){
+		return bt.security.soft(socket,"playlist-queue").then(function(){
+			mod.playNext();
+		});
+	}
+	
 	mod.playNext = function(){
 		if(lnActive.data.volat){
 			lnActive.remove();

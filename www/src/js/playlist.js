@@ -10,6 +10,7 @@ var bt = (function (bt,module_name) {
 	const DOMID_PLVEDITPANE = "videoeditor";
 	
 	const DOMID_EPB_TOGGLEV = "toggle-volatile";
+	const DOMID_EPB_SKIP = "play-next";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -31,15 +32,21 @@ var bt = (function (bt,module_name) {
 			(function looper(){
 			
 				var again = function(){ setTimeout(looper,1000); }
-			
-				var toggleVolatileWrapper = document.getElementById(DOMID_EPB_TOGGLEV);
-				if(!toggleVolatileWrapper) return again();
-				
-				var toggleVolatile = toggleVolatileWrapper.getElementsByTagName('button')[0];
+				var innerButton = function(elemid){ 
+					var wrapper = document.getElementById(elemid);
+					if(!wrapper) return false;
+					return wrapper.getElementsByTagName('button')[0]; 
+				}
+
+				var toggleVolatile = innerButton(DOMID_EPB_TOGGLEV);
 				if(!toggleVolatile) return again();
 				
+				var skip = innerButton(DOMID_EPB_SKIP);
+				if(!skip) return again();
+				
 				resolve({
-					toggleVolatile:toggleVolatile
+					toggleVolatile:toggleVolatile,
+					skip:skip,
 				});
 								
 			})()
@@ -452,6 +459,7 @@ var bt = (function (bt,module_name) {
 	
 	// configure the edit controls.
 	playlist.getEditPaneControls().then(function(controls){
+	
 		controls.toggleVolatile.addEventListener('click',function(){
 			var video = playlist.editTarget.item;
 			bt.rawEmit(module_name,"modify",{
@@ -459,7 +467,14 @@ var bt = (function (bt,module_name) {
 				data: { volat: !video.data.volat }
 			});
 			playlist.showPane();
-		})
+		});
+		
+		controls.skip.addEventListener('click',function(){
+			var video = playlist.editTarget.item;
+			bt.rawEmit(module_name,'next','pls');
+			playlist.showPane();
+		});
+		
 	})
 	
 	return bt;
