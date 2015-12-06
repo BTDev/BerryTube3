@@ -60,6 +60,8 @@
 			
 			scrubber.prescrub();
 			scrubber.scrub({clientY:-delta*3});
+			e.preventDefault();
+			return false;
 		}
 			
 		scrubber.scrub = function(ev){

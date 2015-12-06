@@ -19,15 +19,17 @@
 	]
 	
 	// Optional Fields
+	/*
 	theme.load = function(){
 		console.log("Dear Princess Celestia");
 	}
 	theme.unload = function(replacer){
 		console.log("Oh I see, you like",replacer,"more :(");
 	}
+	*/
 	
 	// You can also do whatever you want in here. its JS, it runs as you expect.
-	console.log("FREEDOM");
+	//console.log("FREEDOM");
 	
 	// Finally, register the theme.
 	bt.registerTheme(theme);

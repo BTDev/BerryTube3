@@ -114,7 +114,26 @@ body{
 		}
 	
 		#plitems {
-			margin-right:20px;	
+			margin-right:20px;
+	
+			&:after{
+				background: rgba(0,0,0,0);
+				pointer-events: none;
+				content: "";
+				display: block;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				width: 100%;
+				transition: 0.5s all;
+			}
+			
+			&.pane-open:after {
+				background: rgba(0,0,0,0.8);
+				pointer-events: all;
+			}
+			
+			
 		}
 		
 		.scrolltrack {

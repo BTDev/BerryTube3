@@ -7,6 +7,7 @@ var bt = (function (bt,module_name) {
 	const DOMID_PLCONTROLS = "playlistcontrols";
 	const DOMID_PLQUEUETB = "queuetb";
 	const DOMID_PLQUEUEPANE = "queuepane";
+	const DOMID_PLVEDITPANE = "videoeditor";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -185,9 +186,38 @@ var bt = (function (bt,module_name) {
 			return stopScrubbing(ev);
 		},false);
 
+		// Open pane on rclick
+		elem.addEventListener("contextmenu",function(ev){
+			ev.preventDefault();
+			
+			playlist.showPane();
+			playlist.setEditTarget(elem);
+			playlist.showPane(playlist.editpane);
+			
+			return false;
+		},false);
+		
 		playlist.list.appendChild(elem);
 		return elem;
 	
+	}
+	
+	playlist.editpane = document.getElementById(DOMID_PLVEDITPANE);
+	playlist.editTarget = false;
+	playlist.setEditTarget = function(video){
+		playlist.editTarget = video;
+		
+		var elems = playlist.editpane.getElementsByTagName("*");
+		var dName = false;
+		for(var i=0;i<elems.length;i++){
+			var elem = elems[i];
+			if(elem.name == 'title'){ dName = elem; continue; }
+		}
+		
+		if(dName){
+			dName.value = playlist.editTarget.item.data.title;
+		}
+		
 	}
 	
 	playlist.move = function(from,to,side){
@@ -319,19 +349,42 @@ var bt = (function (bt,module_name) {
 				var paneId = playlist.activeControlBtn.getAttribute("pane");
 				pane = document.getElementById(paneId);
 			}
-			
-			if(playlist.activePane){
-				playlist.activePane.classList.remove("active");
-			}
-			if(pane && playlist.activePane != pane){
-				playlist.activePane = pane;
-				playlist.activePane.classList.add("active");
-			} else {
-				playlist.activePane = false;
-			} 
+			playlist.showPane(pane);
 			
 		}
 		elem.addEventListener("click",elem.clickFn);
+	}
+	
+	playlist.showPane = function(pane){
+		if(playlist.activePane){
+			playlist.activePane.classList.remove("active");
+			playlist.list.classList.remove("pane-open");
+		}
+		if(pane && playlist.activePane != pane){
+			playlist.activePane = pane;
+			playlist.activePane.classList.add("active");
+			playlist.list.classList.add("pane-open");
+			
+			var childOf = function(elem,parent){
+				var ancestor = elem;
+				while(ancestor && ancestor != document){
+					if(ancestor == parent) return true;
+					ancestor = ancestor.parentNode;
+				}
+				return false;
+			}
+			
+			var dismiss = function(ev){
+				if(childOf(ev.target,playlist.activePane)) return;
+				playlist.showPane();
+				document.body.removeEventListener("mousedown",dismiss,false);
+			}
+			
+			document.body.addEventListener("mousedown",dismiss,false);
+			
+		} else {
+			playlist.activePane = false;
+		} 
 	}
 	
 	playlist.controlgroup = document.getElementById(DOMID_PLCONTROLS);
