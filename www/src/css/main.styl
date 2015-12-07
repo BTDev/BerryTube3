@@ -335,7 +335,7 @@ body{
 	// Chat "Module"
 	#chat {
 
-		font-size: 12pt;
+		font-size: 10pt;
 		width: social-width;
 		box-sizing: border-box;
 
@@ -363,10 +363,11 @@ body{
 				box-sizing: border-box;
 				overflow-y: scroll;
 				overflow-x: hidden;
+				word-wrap: break-word;
 				
 				.chatline {
 					
-					margin: 5px 0 0;
+					margin: 5px 5px 0;
 					
 					span {
 						padding: 0 3px;
@@ -390,9 +391,14 @@ body{
 					}
 					
 					&.addendum{
-						margin: 0 0 0 20px;
+						margin-left: 20px;
+						margin-top: 0;
 						.timestamp { display:none }
 						.username { display:none } 
+					}
+					
+					&:last-child{
+						margin-bottom: 10px;
 					}
 					
 					
@@ -433,6 +439,7 @@ body{
 			width: 100%;
 			position: absolute;
 			bottom: 0;
+			font-size: 10pt;
 			
 			.user {
 				font-weight: bold;
