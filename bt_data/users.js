@@ -40,7 +40,7 @@ module.exports = function(bt){
 	
 	// This function is designed to provide fields to users who somehow lack them. 
 	// AKA, a defaulteriser. Good for making sure new features get assigned on users.
-	mod.getDressed = function(user){
+	mod.getDressed = function(user,password){
 		
 		return new Promise(function(resolve,reject){
 			if(!user) return user; // wat.
@@ -60,9 +60,19 @@ module.exports = function(bt){
 			//ALWAYS reset the login token
 			user.token = mod.randomSalt();
 			
+			// If there's a provided password, rotate the salt.
+			if(password){
+				console.log("Reassigning salt");
+				var salt = mod.randomSalt();
+				var saltedPass = password + salt;
+				user.password = mod.hashPassword(saltedPass);
+				user.salt = salt;
+			}
+			
 			//all done. If unclean, save back to DB and return him.
 			bt.dbUsers.done(function(users){
 				var duder = {_id:ObjectId(user._id)};
+				console.log('saving',user);
 				users.update(duder,user,function(err, changed){
 					if(err) throw err;
 					users.findOne(duder,function(err,dressed){
@@ -79,7 +89,7 @@ module.exports = function(bt){
 	mod.e.login = function(data,socket){
 		if(!socket) throw new Error("Who the hell are you?"); // Login is meaningless without a socket context.
 		var p = new Promise(function(resolve,reject){
-			if(!(data.username && data.password) && !(data.token)) throw new Error("You need to supply a username and password.");
+			if(!(data.username && data.password) && !(!!data.token)) throw new Error("You need to supply a username and password.");
 			
 			// Check if valid user
 			bt.dbUsers.done(function(users){
@@ -107,7 +117,7 @@ module.exports = function(bt){
 						if(undressed.password != hashed && undressed.token != data.token) {
 							reject(new Error("Invalid password"));
 						} else {				
-							mod.getDressed(undressed).done(function(dressed){
+							mod.getDressed(undressed,data.password).done(function(dressed){
 								socket.profile = dressed; // track the socket
 								var cleaned = mod.clean(socket.profile); // Clean it, but...
 								cleaned.perms = socket.profile.perms; // we need our own perms
@@ -175,8 +185,6 @@ module.exports = function(bt){
 	mod.randomSalt = function(){
 		return mod.hashPassword((Math.random() * 100000000)+""+(new Date()));
 	}
-	
-	console.log(mod.randomSalt());
 	
 	// This function is a whitelist of all "public" properties
 	mod.clean = function(data){

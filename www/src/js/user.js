@@ -23,7 +23,7 @@ var bt = (function (bt,module_name) {
 	user.handleLoginBad = function(e){
 		user.profile = {};
 		bt.setFlag(FLAG_LOGGED_IN,false);
-		localStorage.setItem('token', false);
+		localStorage.removeItem('token');
 	}
 	
 	user.loginWithToken = function(token){
