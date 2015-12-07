@@ -44,35 +44,33 @@ module.exports = function(bt){
 		
 		return new Promise(function(resolve,reject){
 			if(!user) return user; // wat.
-			var clean = true;
 			
 			// Check for birthday
-			if(!user.joinedon) { user.joinedon = new Date(); clean = false; }
+			if(!user.joinedon) { user.joinedon = new Date(); }
 			
 			// Check for defined sort order
-			if(typeof user.ulsort == "undefined") { user.ulsort = 0; clean = false; }
+			if(typeof user.ulsort == "undefined") { user.ulsort = 0; }
 			
 			// Check for classes
-			if(typeof user.classes == "undefined") { user.classes = []; clean = false; }
+			if(typeof user.classes == "undefined") { user.classes = []; }
 			
-			// Check for classes
-			if(typeof user.perms == "undefined") { user.perms = []; clean = false; }
+			// Check for perms
+			if(typeof user.perms == "undefined") { user.perms = []; }
+			
+			//ALWAYS reset the login token
+			user.token = mod.randomSalt();
 			
 			//all done. If unclean, save back to DB and return him.
-			if(!clean){
-				bt.dbUsers.done(function(users){
-					var duder = {_id:ObjectId(user._id)};
-					users.update(duder,user,function(err, changed){
+			bt.dbUsers.done(function(users){
+				var duder = {_id:ObjectId(user._id)};
+				users.update(duder,user,function(err, changed){
+					if(err) throw err;
+					users.findOne(duder,function(err,dressed){
 						if(err) throw err;
-						users.findOne(duder,function(err,dressed){
-							if(err) throw err;
-							resolve(dressed);
-						});
+						resolve(dressed);
 					});
 				});
-			} else {
-				resolve(user);
-			}
+			});
 			
 		});
 		
@@ -81,11 +79,16 @@ module.exports = function(bt){
 	mod.e.login = function(data,socket){
 		if(!socket) throw new Error("Who the hell are you?"); // Login is meaningless without a socket context.
 		var p = new Promise(function(resolve,reject){
-			if(!(data.username && data.password)) throw new Error("You need to supply a username and password.");
+			if(!(data.username && data.password) && !(data.token)) throw new Error("You need to supply a username and password.");
 			
 			// Check if valid user
 			bt.dbUsers.done(function(users){
-				var s = {username:data.username};
+			
+				var s = {};
+				if(data.token) s.token = data.token;
+				if(data.username) s.username = data.username;
+				console.log("OK with",data);
+				
 				users.findOne(s,function(err,undressed){
 					if(err) throw err;				
 					if(undressed){
@@ -101,13 +104,14 @@ module.exports = function(bt){
 						var saltedPass = data.password + salt;
 						var hashed = mod.hashPassword(saltedPass);
 												
-						if(undressed.password != hashed) {
+						if(undressed.password != hashed && undressed.token != data.token) {
 							reject(new Error("Invalid password"));
 						} else {				
 							mod.getDressed(undressed).done(function(dressed){
 								socket.profile = dressed; // track the socket
 								var cleaned = mod.clean(socket.profile); // Clean it, but...
-								cleaned.perms = socket.profile.perms; // we need our own perms at least.
+								cleaned.perms = socket.profile.perms; // we need our own perms
+								cleaned.token = socket.profile.token; // we need our own token
 								resolve(cleaned); // tell the sucker
 							});
 						}
@@ -151,10 +155,11 @@ module.exports = function(bt){
 				newbie.username = data.username || "Shithead";
 				newbie.password = hashedpw || "password";
 				 
-				var salt = mod.hashPassword((Math.random() * 100000000)+"");
+				var salt = mod.randomSalt();
 				var saltedPass = data.password + salt;
 				newbie.password = mod.hashPassword(saltedPass);
 				newbie.salt = salt;
+				newbie.token = mod.randomSalt(); // for signon
 				
 				newbie.joinedon = new Date();
 				
@@ -166,6 +171,12 @@ module.exports = function(bt){
 			
 		});
 	}
+	
+	mod.randomSalt = function(){
+		return mod.hashPassword((Math.random() * 100000000)+""+(new Date()));
+	}
+	
+	console.log(mod.randomSalt());
 	
 	// This function is a whitelist of all "public" properties
 	mod.clean = function(data){

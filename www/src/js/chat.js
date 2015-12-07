@@ -8,6 +8,7 @@ var bt = (function (bt,module_name) {
 	const DOMID_CHAT_LOGIN_USERNAME = "loginusername";
 	const DOMID_CHAT_LOGIN_PASSWORD = "loginpassword";
 	const DOMID_CHAT_LOGIN_BUTTON = "loginbutton";
+	const DOMID_CHAT_LOGIN_REMEMBER = "remember-me";
 	const DOMID_CHAT_REGISTER_BUTTON = "registerbutton";
 	const BUFFER_SIZE = 100;
 	const HISTORY_SIZE = 100; //cause why not.
@@ -46,6 +47,10 @@ var bt = (function (bt,module_name) {
 			if(!loginbtn) return false;
 			
 			// define input
+			var loginremember = document.getElementById(DOMID_CHAT_LOGIN_REMEMBER); 
+			if(!loginremember) return false;
+			
+			// define input
 			var regbtn = document.getElementById(DOMID_CHAT_REGISTER_BUTTON); 
 			if(!regbtn) return false;
 			
@@ -55,6 +60,7 @@ var bt = (function (bt,module_name) {
 				username:username,
 				password:password,
 				loginbtn:loginbtn,
+				loginremember:loginremember,
 				regbtn:regbtn,
 			}
 			
@@ -234,7 +240,7 @@ var bt = (function (bt,module_name) {
 	chat.loginFromDom = function(e){
 		if(e && e.keyCode != 13) return false;
 		chat.getChatControls.done(function(controls){
-			bt.user.login(controls.username.value,controls.password.value).then(function(){
+			bt.user.login(controls.username.value,controls.password.value,!!controls.loginremember.checked).then(function(){
 				controls.username.value = "";
 				controls.password.value = "";
 			},function(e){

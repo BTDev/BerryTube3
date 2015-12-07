@@ -50,17 +50,18 @@ var bt = (function (bt,module_name) {
 				});
 								
 			})()
-		});
+		}); 
 	}
 	
 	playlist.e.fulllist = function(data){
+		console.log("fulllist got",data); 
 		playlist.evqueue.run(function(done){
 			playlist.clear();
 			for(var i=0;i<data.length;i++){
 				playlist.addItem(data[i]);
 			}
 			var resp = bt.rawEmit(module_name,"getactive","pls");
-			resp.then(function(active){
+			resp.then(function(active){ 
 				playlist.e.active(active); // perfect use case of this stuff
 			}).then(function(){
 				bt.rawEmit(module_name,"getpointer","pls").then(function(pointer){
@@ -343,11 +344,16 @@ var bt = (function (bt,module_name) {
 	
 	playlist.queueVideo = function(url,other){
 		var data = { url:url };
-		if(other && other == 'volat') data.volat = 'volat';
+		if(other && other == 'volat') data.volat = 'volat';  
 		bt.rawEmit(module_name,"queue",data);
-	}
+	} 
 	
 	playlist.e.active = function(data){
+		console.log("active = ",data);
+		
+		if(!data || !data.video) return;
+		if(!playlist.map[data.video.id]) return;
+		
 		if(playlist.activeTrack) playlist.activeTrack.classList.remove("active");
 		playlist.activeTrack = playlist.map[data.video.id];
 		if(playlist.activeTrack) playlist.activeTrack.classList.add("active");		

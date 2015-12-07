@@ -94,7 +94,7 @@ var bt = (function () {
 	};
 	
 	bt.getFlag = function(flag){
-		document.body.getAttribute('data-bt-'+flag);
+		return document.body.getAttribute('data-bt-'+flag);
 	}
 	
 	bt.themes = [];

@@ -342,7 +342,7 @@ module.exports = function(bt){
 				mod.setPointer(newbie);
 			});
 		});
-	};
+	}; 
 	
 	mod.e.modify = function(data,socket){
 		// TODO this should probably do different security checks based on what exactly we are modifying. for now queue will work.
@@ -386,7 +386,7 @@ module.exports = function(bt){
 	mod.lastCheckAt = +(new Date());
 	mod.timer = setInterval(function(){mod.clockTick();},1000);
 	mod.clockTick = function(){
-		
+
 		var now = +(new Date());
 		var elapsed = (now - mod.lastCheckAt) / 1000;
 		mod.lastCheckAt = now;
@@ -397,8 +397,11 @@ module.exports = function(bt){
 		
 		// Add delta to current counter.
 		mod.timeSinceStart += elapsed;
+
 		if(lnActive && lnActive.data && lnActive.data.length){
+			//console.log("check");
 			if(mod.timeSinceStart > lnActive.data.length + 3){ // TODO make the +3 configurable
+				//console.log("NEXT");
 				mod.playNext();
 			}
 		} else {
