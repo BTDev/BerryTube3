@@ -131,8 +131,9 @@ var bt = (function (bt,module_name) {
 		return p;
 	}
 	
-	chat.newMsgElement = function(name,elem){
-		var x = document.createElement("span");
+	chat.newMsgElement = function(name,elem,tag){
+		tag = tag || "span";
+		var x = document.createElement(tag);
 		x.classList.add(name);
 		elem.appendChild(x);
 		return x;
@@ -202,9 +203,10 @@ var bt = (function (bt,module_name) {
 		
 		// ensure
 		msg.domlist = msg.domlist || {};
-		msg.domlist.timestamp = msg.domlist.timestamp || chat.newMsgElement("timestamp",msg)
-		msg.domlist.username = msg.domlist.username || chat.newMsgElement("username",msg)
-		msg.domlist.message = msg.domlist.message || chat.newMsgElement("message",msg)
+		msg.domlist.innerwrap = msg.domlist.innerwrap || chat.newMsgElement("innerwrap",msg,"div");
+		msg.domlist.timestamp = msg.domlist.timestamp || chat.newMsgElement("timestamp",msg.domlist.innerwrap);
+		msg.domlist.username = msg.domlist.username || chat.newMsgElement("username",msg.domlist.innerwrap);
+		msg.domlist.message = msg.domlist.message || chat.newMsgElement("message",msg.domlist.innerwrap);
 		
 		// render
 		msg.domlist.timestamp.innerHTML = chat.fieldRender("timestamp",msg.domvals.timestamp);
@@ -215,6 +217,18 @@ var bt = (function (bt,module_name) {
 		if(chat.lastSpeaker && chat.lastSpeaker == msg.domvals.username){
 			msg.classList.add("addendum");
 		}
+		
+		// Handle Squees (simple right now, eventually should load user-supplied squees from profile.
+		bt._('user.profile.username').then(function(username){
+			if(msg.domvals.username == username) return;
+			if(!!msg.domvals.message.match(new RegExp(username,'ig'))){
+				msg.classList.add("squee");
+				if(!bt.isTabActive()){
+					bt.notify();
+				}
+			}
+		});
+		
 		chat.lastSpeaker = msg.domvals.username;
 		
 		// Add to the bottom of the chat.
@@ -240,11 +254,16 @@ var bt = (function (bt,module_name) {
 	chat.loginFromDom = function(e){
 		if(e && e.keyCode != 13) return false;
 		chat.getChatControls.done(function(controls){
-			bt.user.login(controls.username.value,controls.password.value,!!controls.loginremember.checked).then(function(){
-				controls.username.value = "";
-				controls.password.value = "";
-			},function(e){
-				bt.log(e);
+		
+			bt._('user').then(function(user){
+			
+				user.login(controls.username.value,controls.password.value,!!controls.loginremember.checked).then(function(){
+					controls.username.value = "";
+					controls.password.value = "";
+				},function(e){
+					bt.log(e);
+				});
+				
 			});
 		});
 		return false;
@@ -253,10 +272,15 @@ var bt = (function (bt,module_name) {
 	chat.registerFromDom = function(e){
 		if(e && e.keyCode != 13) return; 
 		chat.getChatControls.done(function(controls){
-			bt.user.register(controls.username.value,controls.password.value).then(function(){
-				chat.loginFromDom();
-			},function(e){
-				bt.log(e);
+		
+			bt._('user').then(function(user){
+		
+				user.register(controls.username.value,controls.password.value).then(function(){
+					chat.loginFromDom();
+				},function(e){
+					bt.log(e);
+				});
+				
 			});
 		});
 	}

@@ -365,41 +365,55 @@ body{
 				overflow-x: hidden;
 				word-wrap: break-word;
 				
+				
 				.chatline {
-					
-					margin: 5px 5px 0;
 
-					.timestamp {
-						font-size: 0.7em;
-						font-style: italic;
-						&:before { content: "<"; }
-						&:after { content: ">"; }
-						padding: 0 3px;
+					.innerwrap {
+							
+						margin: 5px 5px 0;
+						position: relative;
+						
+						.timestamp {
+							font-size: 0.7em;
+							font-style: italic;
+							&:before { content: "<"; }
+							&:after { content: ">"; }
+							padding: 0 3px;
+						}
+						
+						.username {
+							font-weight:bold;
+							&:after { content: ":"; }
+							padding: 0 3px;
+						}
+						
 					}
 					
-					.username {
-						font-weight:bold;
-						&:after { content: ":"; }
-						padding: 0 3px;
-					}
+				}
+				
+				.error{
+					color: #D60000;
+					background-color: rgba(255, 0, 0, 0.08);
+				}
+				
+				.addendum{
 					
-					&.error{
-						color: #D60000;
-						background-color: rgba(255, 0, 0, 0.08);
-					}
-					
-					&.addendum{
+					.innerwrap {
+				
 						margin-left: 20px;
 						margin-top: 3px;
 						.timestamp { display:none }
 						.username { display:none } 
+						
 					}
-					
-					&:last-child{
-						margin-bottom: 10px;
-					}
-					
-					
+				}
+				
+				.squee {
+					background-color: rgba(255,200,0,0.3);
+				}
+				
+				&:last-child{
+					margin-bottom: 10px;
 				}
 				
 			}

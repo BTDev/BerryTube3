@@ -361,7 +361,9 @@ var bt = (function (bt,module_name) {
 		if(playlist.activeTrack) playlist.activeTrack.classList.remove("active");
 		playlist.activeTrack = playlist.map[data.video.id];
 		if(playlist.activeTrack) playlist.activeTrack.classList.add("active");		
-		bt.player.play(data.video.data.source,data.video.data.key,data.at);
+		bt._('player').then(function(player){
+			player.play(data.video.data.source,data.video.data.key,data.at);
+		});
 	}
 	
 	playlist.e.update = function(data){
@@ -443,7 +445,7 @@ var bt = (function (bt,module_name) {
 	}
 	
 	playlist.controlgroup = document.getElementById(DOMID_PLCONTROLS);
-	var buttons = bt.playlist.controlgroup.childNodes;
+	var buttons = playlist.controlgroup.childNodes;
 	for(var i=0;i<buttons.length;i++){
 		playlist.showPaneButton(buttons[i]);
 	}

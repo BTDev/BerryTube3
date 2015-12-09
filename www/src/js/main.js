@@ -148,6 +148,86 @@ var bt = (function () {
 		return activeTheme;
 	}
 	
+	// Not always required, just a safe way to get async loaded modules/variables..
+	bt._ = function(name){
+		return Q.Promise(function(resolve,reject){
+
+			(function look(){
+				var parts = name.split('.');
+				var check = bt;
+				while(check){
+					if(parts.length == 0){
+						resolve(check);
+						return;
+					}
+					check = check[parts.shift()];
+				}
+				setTimeout(look,50);
+			})();
+			
+		});
+	}
+	
+	var tabActive = true;
+	bt.isTabActive = function(){
+		return tabActive;
+	}
+	
+	bt.whenTabActive = function(){
+		return Q.Promise(function(resolve,reject){
+			var x = setInterval(function(){
+				if(tabActive){
+					resolve();
+					clearInterval(x);
+				}
+			},500);
+		});
+	}
+	
+	var currentNotify = false;
+	bt.notify = function(words){
+	
+		words = words || "Hey! Listen!";
+		
+		var squee = function(){
+			bt._('util').then(function(util){
+				util.sfx.squee();
+			});
+		}
+		
+		var flashTab = function(){
+		
+			bt._('util').then(function(util){
+			
+				var eo = false;
+				if(currentNotify){
+					clearInterval(currentNotify);
+				}
+				
+				currentNotify = setInterval(function(){			
+					if(eo) util.setPageTitle(words);
+					else util.setPageTitle();
+					eo = !eo;
+				},1000); 
+				
+				bt.whenTabActive().then(function(){
+					clearInterval(currentNotify);
+					util.setPageTitle();
+				});
+			
+			});
+		}
+		
+		if(!bt.isTabActive()) flashTab();
+		if(!bt.isTabActive()) squee();
+	}
+	
+	var onFocus = function(){ tabActive = true; console.log(bt.isTabActive()) };
+	var onBlur = function(){ tabActive = false; console.log(bt.isTabActive()) };
+	
+	window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+	
 	return bt;
 }()); 
 
