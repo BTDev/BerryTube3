@@ -68,6 +68,10 @@ var bt = (function (bt,module_name) {
 					playlist.setPointer(playlist.map[pointer.id]);
 					done();
 				});
+			},function(e){
+				console.error("Error Getting Fulllist");
+				console.error(e);
+				done();
 			});
 			//done();
 		});
