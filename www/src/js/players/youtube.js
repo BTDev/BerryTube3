@@ -50,13 +50,15 @@ var bt = (function (bt) {
 	player.name = "youtube";
 	player.play = function(key,time){
 		var called = +new Date();
+		
 		return new Q.Promise(function(resolve,reject){
 			innerPlayer.done(function(ip){
 				bt._('util').then(function(util){
 					
 					var halfPing = (util.getPing() / 2000);
-					var delta = ((+new Date()) - called) / 1000;
-				
+					var now = +new Date();
+					var delta = (now - called) / 1000;
+					console.log('delta = (now - called) / 1000',now,"-",called,"=",delta);
 					console.log("basetime",time,"ping",halfPing,"delta",delta);
 				
 					time = time + halfPing + delta;
