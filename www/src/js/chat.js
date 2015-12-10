@@ -168,6 +168,7 @@ var bt = (function (bt,module_name) {
 		return data;
 	}
 	
+	var chatEvenOdd = false;
 	chat.newMsg = function(data,channel){
 		
 		// Before anything else, let's remember if we're docked to the bottom
@@ -228,6 +229,10 @@ var bt = (function (bt,module_name) {
 				}
 			}
 		});
+		
+		// Handle Even/Odd Tagging.
+		if(chatEvenOdd) msg.classList.add("even");
+		chatEvenOdd = !chatEvenOdd;
 		
 		chat.lastSpeaker = msg.domvals.username;
 		
