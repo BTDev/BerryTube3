@@ -53,15 +53,16 @@ var bt = (function (bt,module_name) {
 			
 			// 100 is pretty irregular, ping again in 5 seconds.
 			if(stdDev > 100){setTimeout(doPing,5000);}
+			
 		});
 	}
 	util.getPing = function(){
 		return average(pings);
 	}
-	util.getOffset = function(){
+	util.getTimeOffset = function(){
 		return offset;
 	}
-	util.getStdDev = function(){
+	util.getPingStdDev = function(){
 		return stdDev;
 	}
 	for(var i=0;i<10;i++) doPing();

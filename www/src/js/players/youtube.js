@@ -58,8 +58,8 @@ var bt = (function (bt) {
 					var halfPing = (util.getPing() / 2000);
 					var now = +new Date();
 					var delta = (now - called) / 1000;
-					console.log('delta = (now - called) / 1000',now,"-",called,"=",delta);
-					console.log("basetime",time,"ping",halfPing,"delta",delta);
+					//console.log('delta = (now - called) / 1000',now,"-",called,"=",delta);
+					//console.log("basetime",time,"ping",halfPing,"delta",delta);
 				
 					time = time + halfPing + delta;
 					if(time < 0){
@@ -67,7 +67,7 @@ var bt = (function (bt) {
 						ip.pauseVideo();
 						var delay = time * -1000;
 						setTimeout(function(){
-							console.log("waited",delay,"to play");
+							//console.log("waited",delay,"to play");
 							ip.playVideo();
 						},delay);
 					} else {
