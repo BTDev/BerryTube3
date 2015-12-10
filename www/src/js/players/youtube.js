@@ -49,8 +49,10 @@ var bt = (function (bt) {
 	// REQUIRED
 	player.name = "youtube";
 	player.play = function(key,time){
+		var called = +new Date();
 		return new Q.Promise(function(resolve,reject){
 			innerPlayer.done(function(ip){
+				time += ((+new Date()) - called) / 1000;
 				if(time < 0){
 					ip.loadVideoById(key, 0, "large");
 					ip.pauseVideo();
