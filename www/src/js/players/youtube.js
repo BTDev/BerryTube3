@@ -52,18 +52,27 @@ var bt = (function (bt) {
 		var called = +new Date();
 		return new Q.Promise(function(resolve,reject){
 			innerPlayer.done(function(ip){
-				time += ((+new Date()) - called) / 1000;
-				if(time < 0){
-					ip.loadVideoById(key, 0, "large");
-					ip.pauseVideo();
-					var delay = time * -1000;
-					setTimeout(function(){
-						console.log("waited",delay,"to play");
-						ip.playVideo();
-					},delay);
-				} else {
-					ip.loadVideoById(key, time, "large");
-				}
+				bt._('util').then(function(util){
+					
+					var halfPing = (util.getPing() / 2000);
+					var delta = ((+new Date()) - called) / 1000;
+				
+					console.log("basetime",time,"ping",halfPing,"delta",delta);
+				
+					time = time + halfPing + delta;
+					if(time < 0){
+						ip.loadVideoById(key, 0, "large");
+						ip.pauseVideo();
+						var delay = time * -1000;
+						setTimeout(function(){
+							console.log("waited",delay,"to play");
+							ip.playVideo();
+						},delay);
+					} else {
+						ip.loadVideoById(key, time, "large");
+					}
+				
+				});
 			});
 		});
 	};

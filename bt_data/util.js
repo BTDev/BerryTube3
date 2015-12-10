@@ -53,8 +53,11 @@ module.exports = function(bt){
 			mod.sendNewTitle(bt.io);
 		});
 		
-		
 	};
+	
+	mod.e.ping = function(socket){
+		return +new Date();
+	}
 	
 	bt.io.on("connection",function(socket){
 		mod.sendNewTitle(socket);
