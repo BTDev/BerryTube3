@@ -352,9 +352,7 @@ var bt = (function (bt,module_name) {
 		bt.rawEmit(module_name,"queue",data);
 	} 
 	
-	playlist.e.active = function(data){
-		console.log("active = ",data);
-		
+	playlist.e.active = function(data){	
 		if(!data || !data.video) return;
 		if(!playlist.map[data.video.id]) return;
 		

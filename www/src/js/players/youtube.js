@@ -50,7 +50,6 @@ var bt = (function (bt) {
 	player.name = "youtube";
 	player.play = function(key,time){
 		var called = +new Date();
-		
 		return new Q.Promise(function(resolve,reject){
 			innerPlayer.done(function(ip){
 				bt._('util').then(function(util){
@@ -61,7 +60,7 @@ var bt = (function (bt) {
 					//console.log('delta = (now - called) / 1000',now,"-",called,"=",delta);
 					//console.log("basetime",time,"ping",halfPing,"delta",delta);
 				
-					time = time + halfPing + delta;
+					time = time + halfPing + delta; 
 					if(time < 0){
 						ip.loadVideoById(key, 0, "large");
 						ip.pauseVideo();
@@ -71,13 +70,27 @@ var bt = (function (bt) {
 							ip.playVideo();
 						},delay);
 					} else {
-						ip.loadVideoById(key, time, "large");
+						var data = ip.getVideoData();
+						if(data && data.video_id == key){
+							player.seek(time);
+						} else {
+							ip.loadVideoById(key, time, "large");
+						}
+						
 					}
 				
 				});
 			});
 		});
 	};
+	player.seek = function(time,force){
+		innerPlayer.done(function(ip){
+			var distance = Math.abs(ip.getCurrentTime() - time);
+			if(force || distance > 1){
+				ip.seekTo(time);
+			}
+		})
+	}
 	
 	// The naming here is a little confusing, but deal with it.
 	var assignPlayer = function(){

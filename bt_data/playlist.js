@@ -268,13 +268,17 @@ module.exports = function(bt){
 		});
 	};
 	
+	mod.genActiveStub = function(){
+		return {
+			video:mod.simplePlItem(lnActive),
+			at: mod.timeSinceStart
+		}
+	}
+	
 	mod.sendActive = function(socket){
 		socket.emit(module_name,{
 			ev:"active",
-			data: {
-				video:mod.simplePlItem(lnActive),
-				at: mod.timeSinceStart
-			}
+			data: mod.genActiveStub()
 		});
 	};
 	
@@ -318,10 +322,7 @@ module.exports = function(bt){
 	};
 	
 	mod.e.getactive = function(){
-		return {
-			video:mod.simplePlItem(lnActive),
-			at: mod.timeSinceStart
-		};
+		return mod.genActiveStub();
 	};
 	
 	mod.e.queue = function(data,socket){
@@ -384,7 +385,11 @@ module.exports = function(bt){
 	// we need to start a sort of subtask
 	mod.timeSinceStart = -2; // TODO make this configurable
 	mod.lastCheckAt = +(new Date());
-	mod.timer = setInterval(function(){mod.clockTick();},1000);
+	mod.clockTickHandle = setInterval(function(){mod.clockTick();},1000);
+	mod.heartbeatHandle = setInterval(function(){mod.heartbeatTick();},3000);
+	mod.heartbeatTick = function(){
+		mod.sendActive(bt.io); 
+	};
 	mod.clockTick = function(){
 
 		var now = +(new Date());

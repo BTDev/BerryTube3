@@ -277,15 +277,12 @@ var bt = (function (bt,module_name) {
 	chat.registerFromDom = function(e){
 		if(e && e.keyCode != 13) return; 
 		chat.getChatControls.done(function(controls){
-		
 			bt._('user').then(function(user){
-		
 				user.register(controls.username.value,controls.password.value).then(function(){
 					chat.loginFromDom();
 				},function(e){
 					bt.log(e);
 				});
-				
 			});
 		});
 	}

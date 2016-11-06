@@ -87,8 +87,8 @@ bt.register = (function(){
 		// While we can assign multiple internal event hooks without problem, we can only assign one
 		// external -> internal event proxy, or else everything will fire multiple times depending on how
 		// many listeners there are.
-		
     
+		
 		bt.log("Assigning Connection CB for",evname);
     
 		bt.io.on("connection",function(socket){

@@ -460,14 +460,25 @@ body{
 		}
 		
 	}
-
-	#login {
-		// Only show on perms
-		body[data-bt-logged-in=true] & { display:none; }
-	}
-	
 	 
 }
+
+#login {
+	// Only show on perms
+	body[data-bt-logged-in=true] & { display:none; }
+	.formrow {
+		color: white;
+		label {
+			width: 100px;
+			display: inline-block;
+		}
+		input {
+			width: 100px;
+			display: inline-block;
+		}
+	}
+}
+
 
 #vidcanvas{
  
