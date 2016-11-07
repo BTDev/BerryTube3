@@ -306,8 +306,6 @@ module.exports = function(bt){
 				data:mod.simplePlItem(lnPointer)
 			});
 		}
-		
-		
 	}
 	
 	mod.updateVideo = function(video){

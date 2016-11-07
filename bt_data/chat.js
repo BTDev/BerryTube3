@@ -40,7 +40,7 @@ module.exports = function(bt){
 	
 		return new Promise(function(resolve,reject){
 			var parsed = htmlEscape(raw);
-			console.log(raw,parsed);
+			// console.log(raw,parsed);
 			resolve(parsed);
 		});
 	}
@@ -52,7 +52,7 @@ module.exports = function(bt){
 			messageIndex = 0;
 		}
 		messageIndex++;
-		console.log(messageIndex);
+		// console.log(messageIndex);
 		return (messageIndex).toString(36);
 	}
 
@@ -68,6 +68,21 @@ module.exports = function(bt){
 			if(command == "title"){
 				bt.util.setTitleOverride(message)
 				return;
+			}
+			
+			if(command == "die"){
+				var sockets = bt.users.getSocketsOfUser({_id:profile._id});		
+				sockets.forEach(function(socket){
+					socket.emit(module_name,{
+						ev:"message",
+						data:{
+							username:"Sys",
+							message:"Found "+sockets.length+" sockets",
+							timestamp: new Date(),
+							id: mod.getMessageID()
+						}
+					});
+				});
 			}
 			
 		}

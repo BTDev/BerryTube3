@@ -62,7 +62,6 @@ module.exports = function(bt){
 			
 			// If there's a provided password, rotate the salt.
 			if(password){
-				console.log("Reassigning salt");
 				var salt = mod.randomSalt();
 				var saltedPass = password + salt;
 				user.password = mod.hashPassword(saltedPass);
@@ -72,7 +71,6 @@ module.exports = function(bt){
 			//all done. If unclean, save back to DB and return him.
 			bt.dbUsers.done(function(users){
 				var duder = {_id:ObjectId(user._id)};
-				console.log('saving',user);
 				users.update(duder,user,function(err, changed){
 					if(err) throw err;
 					users.findOne(duder,function(err,dressed){
@@ -97,7 +95,6 @@ module.exports = function(bt){
 				var s = {};
 				if(data.token) s.token = data.token;
 				if(data.username) s.username = data.username;
-				console.log("OK with",data);
 				
 				users.findOne(s,function(err,undressed){
 					if(err) throw err;				
@@ -194,6 +191,21 @@ module.exports = function(bt){
 			classes: data.classes || [],
 			sortorder: data.sortorder || 0
 		};
+	}
+	
+	mod.getSocketsOfUser = function(data){
+		var connected = bt.io.sockets.sockets;
+		var results = [];
+		for(var i=0;i<connected.length;i++){
+			var socket = connected[i];
+			if(!socket.profile) continue;
+			var inc = ( (data._id+"") == (socket.profile._id+"") );
+			if(inc){
+				results.push(socket);
+				console.log("collecting",results.length)
+			}
+		}
+		return results;
 	}
 	
 	return mod;

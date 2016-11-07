@@ -87,7 +87,6 @@ module.exports = function(bt){
 	
 	// watch user events for logins
 	bt.users.events.on("login",function(socket){
-		console.log("userlist caught",socket);
 		mod.watchSocket(socket);
 	});
 	
