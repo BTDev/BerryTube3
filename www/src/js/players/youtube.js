@@ -91,6 +91,9 @@ var bt = (function (bt) {
 			}
 		})
 	}
+	player.generateUrl = id => {
+		return 'https://youtu.be/'+id;
+	}
 	
 	// The naming here is a little confusing, but deal with it.
 	var assignPlayer = function(){

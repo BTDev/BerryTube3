@@ -20,5 +20,16 @@ var bt = (function (bt,module_name) {
 		});
 	}
 	
+	player.generateUrl = function(playername,key){
+		return new Q.Promise(function(resolve,reject){
+			if(!individualPlayers[playername]) 
+				throw new Error("No such player registered "+playername);
+			console.log("calling gen");
+			var url = individualPlayers[playername].generateUrl(key);
+			resolve(url);
+			console.log("got",url);
+		});
+	}
+	
 	return bt;
 }(bt,"player"));

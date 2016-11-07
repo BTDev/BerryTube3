@@ -21,7 +21,7 @@ module.exports = function(bt){
 			if(!data.message) throw new Error("No message received");
 			
 			mod.parseMessage(data.message).then(function(parsed){
-				mod.broadcastMessage(socket.profile,parsed);
+				mod.broadcastMessage(socket,parsed);
 			});
 			
 		});
@@ -55,11 +55,20 @@ module.exports = function(bt){
 		// console.log(messageIndex);
 		return (messageIndex).toString(36);
 	}
+	
+	mod.generateMessage = (username,message) => {
+		return {
+			username:username,
+			message:message,
+			timestamp: new Date(),
+			id: mod.getMessageID()
+		}
+	};
 
 	// Imperitive
-	mod.broadcastMessage = function(profile,message){
+	mod.broadcastMessage = function(socket,message){
 			
-		var regex = /^\/(\w+)\s(.*)/; 
+		var regex = /^\/(\w+)\s?(.*)/; 
 		if(regex.test(message)) { 
 			var match = message.match(regex);
 			var command = match[1];
@@ -70,25 +79,36 @@ module.exports = function(bt){
 				return;
 			}
 			
-			if(command == "die"){
-				var sockets = bt.users.getSocketsOfUser({_id:profile._id});		
-				sockets.forEach(function(socket){
-					socket.emit(module_name,{
+			if(command == "sessions"){
+				var sockets = bt.users.getSocketsOfUser(socket.profile);		
+				sockets.forEach(function(socki){
+					socki.emit(module_name,{
 						ev:"message",
-						data:{
-							username:"Sys",
-							message:"Found "+sockets.length+" sockets",
-							timestamp: new Date(),
-							id: mod.getMessageID()
-						}
+						data:mod.generateMessage("System","Found "+sockets.length+" sessions")
 					});
 				});
+				return;
+			}
+			
+			if(command == "killothersessions"){
+				var sockets = bt.users.getSocketsOfUser(socket.profile);		
+				var i = 0;
+				sockets.forEach(function(socki){
+					if(socki == socket) return;
+					bt.security.kick(socki);
+					i++;
+				});
+				socket.emit(module_name,{
+					ev:"message",
+					data:mod.generateMessage("System","Killed "+i+" other sessions.")
+				});
+				return;
 			}
 			
 		}
 		
 		var blob = {
-			username:profile.username,
+			username:socket.profile.username,
 			message:message,
 			timestamp: new Date(),
 			id: mod.getMessageID()

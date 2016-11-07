@@ -11,6 +11,7 @@ var bt = (function (bt,module_name) {
 	
 	const DOMID_EPB_TOGGLEV = "toggle-volatile";
 	const DOMID_EPB_SKIP = "play-next";
+	const DOMID_EPB_OPENOUTSIDE = "open-outside";
 
 	var playlist = bt.playlist = { e:bt.register(module_name) }; 
 	
@@ -26,28 +27,38 @@ var bt = (function (bt,module_name) {
 		if(!element) return false;
 		return Array.prototype.indexOf.call(element.parentNode.children, element);
 	}
-	
+	//playlist.activeTrack.item
 	playlist.getEditPaneControls = function(){
 		return new Q.Promise(function(resolve,reject){
 			(function looper(){
-			
+				// console.log("getEditPaneControls");
 				var again = function(){ setTimeout(looper,1000); }
-				var innerButton = function(elemid){ 
+				var findButton = function(elemid){ 
+					// console.log("find",elemid);
 					var wrapper = document.getElementById(elemid);
 					if(!wrapper) return false;
-					return wrapper.getElementsByTagName('button')[0]; 
+					var out = {
+						wrapper:wrapper,
+						button:wrapper.getElementsByTagName('button')[0]
+					};
+					return out;
 				}
 
-				var toggleVolatile = innerButton(DOMID_EPB_TOGGLEV);
+				var toggleVolatile = findButton(DOMID_EPB_TOGGLEV);
 				if(!toggleVolatile) return again();
 				
-				var skip = innerButton(DOMID_EPB_SKIP);
+				var skip = findButton(DOMID_EPB_SKIP);
 				if(!skip) return again();
 				
-				resolve({
+				var openOutside = findButton(DOMID_EPB_OPENOUTSIDE);
+				if(!openOutside) return again();
+				
+				var out = {
 					toggleVolatile:toggleVolatile,
 					skip:skip,
-				});
+					openOutside:openOutside,
+				}
+				resolve(out);				
 								
 			})()
 		}); 
@@ -81,6 +92,7 @@ var bt = (function (bt,module_name) {
 		playlist.list.innerHTML = ""; //clean, effective, brutal. Berrytube.
 	}
 	
+	// Creates a Dom element for the playlist representing the passed in playlist item.
 	playlist.addItem = function(item){
 		
 		var elem = document.createElement("div");
@@ -224,9 +236,9 @@ var bt = (function (bt,module_name) {
 		elem.addEventListener("contextmenu",function(ev){
 			ev.preventDefault();
 			
-			playlist.showPane();
-			playlist.setEditTarget(elem);
-			playlist.showPane(playlist.editpane);
+			playlist.showPane(); //Hide other panes
+			playlist.setEditTarget(elem); // Set a target
+			playlist.showPane(playlist.editpane); // Show a pane
 			
 			return false;
 		},false);
@@ -252,6 +264,20 @@ var bt = (function (bt,module_name) {
 			dName.value = playlist.editTarget.item.data.title;
 		}
 		
+		playlist.getEditPaneControls().then(function(controls){
+		
+			// Default toggleVolatile on.
+			controls.toggleVolatile.wrapper.classList.add("visible");
+			controls.openOutside.wrapper.classList.add("visible");
+			
+			// Display Skip on active.
+			if(playlist.activeTrack == video){
+				controls.skip.wrapper.classList.add("visible");
+			} else {
+				controls.skip.wrapper.classList.remove("visible");
+			}
+
+		});
 	}
 	
 	playlist.move = function(from,to,side){
@@ -470,7 +496,8 @@ var bt = (function (bt,module_name) {
 	// configure the edit controls.
 	playlist.getEditPaneControls().then(function(controls){
 	
-		controls.toggleVolatile.addEventListener('click',function(){
+		console.log("controls",controls);
+		controls.toggleVolatile.button.addEventListener('click',function(){
 			var video = playlist.editTarget.item;
 			bt.rawEmit(module_name,"modify",{
 				id: video.id,
@@ -479,10 +506,18 @@ var bt = (function (bt,module_name) {
 			playlist.showPane();
 		});
 		
-		controls.skip.addEventListener('click',function(){
+		controls.skip.button.addEventListener('click',function(){
 			var video = playlist.editTarget.item;
 			bt.rawEmit(module_name,'next','pls');
 			playlist.showPane();
+		});
+		
+		controls.openOutside.button.addEventListener('click',function(){
+			var video = playlist.editTarget.item;
+			bt.player.generateUrl(video.data.source,video.data.key).then(url => {
+				window.open(url,'_blank');
+			});
+			//playlist.showPane();
 		});
 		
 	})
